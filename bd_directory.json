@@ -230,6 +230,11 @@
     "desc": "Supreme Court cause lists, bdlaws codified acts, district courts, online GD & police clearance",
     "tools": [
       {
+        "title": "NTMC Unified Operations Portal (NTMC-PORTAL UI)",
+        "url": "https://portal.ntmc.gov.bd/",
+        "desc": "Direct operational intelligence UI and lawful interception gateway for authorized law enforcement agencies, telecom surveillance, and subscriber data operations."
+      },
+      {
         "title": "Supreme Court of Bangladesh - Cause Lists & Judgments",
         "url": "https://supremecourt.gov.bd/",
         "desc": "Official online daily cause lists, full bench reported judgments, case status lookup, and lawyer roster for Appellate and High Court Divisions."
@@ -347,6 +352,11 @@
         "title": "BTRC - NTTN & Telecom Licensee Directory",
         "url": "https://btrc.gov.bd/",
         "desc": "Official BTRC directory of nationwide transmission networks (NTTN - Fiber@Home, Summit, BTCL, Bahon), IGW, ICX, and licensed ISPs."
+      },
+      {
+        "title": "BTCL Telesheba Customer & Service Portal",
+        "url": "https://telesheba.btcl.gov.bd/",
+        "desc": "Interactive public and subscriber self-service portal for landline telephone, internet connectivity, and billing records."
       }
     ]
   },
