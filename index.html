@@ -863,7 +863,7 @@
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-label">Verified Gov.bd Endpoints</div>
-            <div class="stat-value" style="color: var(--emerald);">86</div>
+            <div id="stat-total-portals" class="stat-value" style="color: var(--emerald);">86</div>
             <div class="stat-spark">🏛️ Direct Ministry & Directorate Systems</div>
           </div>
           <div class="stat-card">
@@ -1739,6 +1739,12 @@ let filteredIndices = [];
 
 // INITIALIZATION
 window.addEventListener('DOMContentLoaded', () => {
+  const totalCount = ALL_BD_TOOLS.length;
+  const badge1 = document.getElementById('total-tools-badge');
+  if (badge1) badge1.innerText = totalCount;
+  const stat1 = document.getElementById('stat-total-portals');
+  if (stat1) stat1.innerText = totalCount;
+
   renderSidebarCategories();
   renderDashboardCategories();
   populateCategoryFilter();
