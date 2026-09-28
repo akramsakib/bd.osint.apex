@@ -1,0 +1,19 @@
+{
+  "name": "BD-OSINT Apex - Bangladesh Government Intelligence Workbench",
+  "short_name": "BD-OSINT Apex",
+  "description": "All-in-One Bangladesh Government OSINT Workbench. Direct Government Portals, Smart NID/BDRIS/e-TIN/BRTA Parsers, e-Porcha Land Records & Case Dossier Studio.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#06090e",
+  "theme_color": "#06090e",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23006a4e'/%3E%3Ccircle cx='230' cy='256' r='140' fill='%23f42a41'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='900' font-size='150' fill='%23ffffff'%3EBD%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity", "security"]
+}

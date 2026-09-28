@@ -1,0 +1,2388 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>BD-OSINT Apex - Bangladesh Government Intelligence & Investigation Workbench</title>
+  <meta name="description" content="All-in-One Bangladesh Government OSINT Workbench. Direct Government Portals, Smart NID/BDRIS/e-TIN/BRTA Parsers, e-Porcha Land Records & Case Dossier Studio.">
+  <meta name="theme-color" content="#06090e">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BD-OSINT Apex">
+  
+  <style>
+    :root {
+      --bg-base: #06090e;
+      --bg-surface: #0b111a;
+      --bg-card: #111a27;
+      --bg-card-hover: #172437;
+      --border: #1e2d42;
+      --border-bright: #334b6e;
+      --border-accent: rgba(0, 240, 255, 0.35);
+      
+      --cyan: #00f0ff;
+      --cyan-glow: rgba(0, 240, 255, 0.15);
+      --emerald: #00ff9d;
+      --emerald-glow: rgba(0, 255, 157, 0.15);
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --purple: #a855f7;
+      --green-bd: #006a4e;
+      --red-bd: #f42a41;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --sidebar-width: 290px;
+      --header-height: 64px;
+      --mobile-dock-height: 64px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hind Siliguri", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.5;
+      height: 100%;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-base); }
+    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+    #app-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 40;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .brand-header {
+      height: var(--header-height);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(0,106,78,0.2) 0%, transparent 100%);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: radial-gradient(circle at 40% 50%, #f42a41 35%, #006a4e 36%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 900;
+      font-size: 16px;
+      box-shadow: 0 0 12px rgba(0,255,157,0.2);
+    }
+
+    .brand-badge {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: rgba(0, 255, 157, 0.12);
+      color: var(--emerald);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 255, 157, 0.3);
+      font-weight: 700;
+    }
+
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 8px;
+    }
+
+    .nav-group-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      padding: 10px 10px 4px 10px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-card);
+      color: var(--text-main);
+    }
+
+    .nav-item.active {
+      background: rgba(0, 240, 255, 0.12);
+      color: var(--cyan);
+      border-left: 3px solid var(--cyan);
+      font-weight: 600;
+    }
+
+    .nav-item-icon {
+      font-size: 15px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .nav-item-count {
+      margin-left: auto;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: var(--bg-card);
+      padding: 2px 6px;
+      border-radius: 10px;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+    }
+
+    #main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #top-nav {
+      height: var(--header-height);
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      gap: 12px;
+      z-index: 30;
+    }
+
+    .search-box-wrap {
+      flex: 1;
+      max-width: 600px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 38px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0 38px 0 36px;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+
+    .search-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px var(--cyan-glow);
+      background: var(--bg-surface);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 14px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 34px;
+      padding: 0 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-main);
+      transition: all 0.15s ease;
+      user-select: none;
+      text-decoration: none;
+      font-family: var(--font-sans);
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-bright);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00f0ff 0%, #00b4d8 100%);
+      color: #000;
+      border-color: #00f0ff;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 12px var(--cyan-glow);
+    }
+
+    .btn-bd {
+      background: linear-gradient(135deg, #00ff9d 0%, #006a4e 100%);
+      color: #000;
+      border-color: #00ff9d;
+      font-weight: 700;
+    }
+
+    .btn-icon { width: 34px; padding: 0; }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--emerald);
+      padding: 4px 8px;
+      background: rgba(0, 255, 157, 0.08);
+      border: 1px solid rgba(0, 255, 157, 0.2);
+      border-radius: 20px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 6px var(--emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    #view-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      position: relative;
+    }
+
+    .view-pane {
+      display: none;
+      animation: fadeIn 0.18s ease-in-out;
+    }
+
+    .view-pane.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+    }
+
+    .stat-spark {
+      font-size: 11px;
+      color: var(--cyan);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .boards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .board-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .board-card:hover {
+      border-color: var(--emerald);
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+    }
+
+    .board-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .board-card-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .board-card-count {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: rgba(0, 255, 157, 0.1);
+      color: var(--emerald);
+      padding: 2px 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 157, 0.3);
+      font-weight: 600;
+    }
+
+    .board-card-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .catalog-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      background: var(--bg-surface);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .filter-select {
+      height: 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      padding: 0 10px;
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 12px;
+    }
+
+    .tool-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .tool-card:hover {
+      border-color: var(--border-bright);
+      background: var(--bg-card-hover);
+    }
+
+    .tool-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .tool-card-info { flex: 1; min-width: 0; }
+
+    .tool-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .tool-meta-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: rgba(0, 255, 157, 0.08);
+      color: var(--emerald);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 255, 157, 0.2);
+      margin-bottom: 4px;
+    }
+
+    .tool-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .tool-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 8px;
+    }
+
+    .tool-url-preview {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--cyan);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .workbench-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wb-tab {
+      padding: 8px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+
+    .wb-tab:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+    }
+
+    .wb-tab.active {
+      background: rgba(0, 255, 157, 0.12);
+      border-color: var(--emerald);
+      color: var(--emerald);
+    }
+
+    .tool-engine-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .engine-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .engine-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-label {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    .text-input {
+      height: 38px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0 12px;
+      color: var(--text-main);
+      font-size: 13px;
+      font-family: var(--font-mono);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .text-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px var(--cyan-glow);
+    }
+
+    .result-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-top: 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+    }
+
+    .result-row:last-child { border-bottom: none; }
+    .result-key { color: var(--text-dim); }
+    .result-val { color: var(--emerald); font-weight: 600; word-break: break-all; text-align: right; }
+
+    .case-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--emerald);
+      color: var(--text-main);
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    #toast-container {
+      position: fixed;
+      bottom: 74px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1000;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      padding: 16px;
+    }
+
+    .modal-overlay.active { display: flex; animation: fadeIn 0.15s ease-out; }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-bright);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 650px;
+      max-height: 88vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { padding: 18px; flex: 1; overflow-y: auto; }
+    .modal-footer { padding: 14px 18px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+    #mobile-dock {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: var(--mobile-dock-height);
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border);
+      z-index: 100;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 8px;
+    }
+
+    .dock-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 600;
+      gap: 3px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+    }
+
+    .dock-btn.active { color: var(--emerald); }
+    .dock-icon { font-size: 18px; }
+
+    @media (max-width: 768px) {
+      #sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); }
+      #mobile-dock { display: flex; }
+      #view-viewport { padding-bottom: calc(var(--mobile-dock-height) + 16px); }
+      .mobile-menu-btn { display: inline-flex !important; }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-menu-btn { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="app-container">
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="brand-logo">
+        <div class="brand-icon">BD</div>
+        <div>
+          <div>BD-OSINT APEX</div>
+          <div style="font-size: 9px; color: var(--text-dim); font-family: var(--font-mono);">BANGLADESH GOVT RECON</div>
+        </div>
+      </div>
+      <span class="brand-badge">GOV.BD</span>
+    </div>
+
+    <div class="sidebar-scroll">
+      <div class="nav-group-title">COMMAND CENTER</div>
+      <div class="nav-item active" onclick="switchView('dashboard')">
+        <span class="nav-item-icon">📊</span><span>Overview Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="switchView('catalog')">
+        <span class="nav-item-icon">🔍</span><span>Gov.bd Directory</span>
+        <span class="nav-item-count" id="total-tools-badge">81</span>
+      </div>
+      <div class="nav-item" onclick="switchView('workbench')">
+        <span class="nav-item-icon">⚡</span><span>BD Active Engines</span>
+        <span class="nav-item-count" style="color:var(--emerald);">8 Active</span>
+      </div>
+      <div class="nav-item" onclick="switchView('dossier')">
+        <span class="nav-item-icon">📋</span><span>Investigation Dossier</span>
+        <span class="nav-item-count" id="case-count-badge">0 Cases</span>
+      </div>
+      <div class="nav-item" onclick="switchView('bookmarks')">
+        <span class="nav-item-icon">⭐</span><span>Pinned Portals</span>
+        <span class="nav-item-count" id="fav-count-badge">0</span>
+      </div>
+
+      <div class="nav-group-title" style="margin-top: 14px;">14 GOVT CATEGORIES</div>
+      <div id="sidebar-categories-list"></div>
+
+      <div class="nav-group-title" style="margin-top: 14px;">DOCUMENTATION</div>
+      <div class="nav-item" onclick="switchView('help')">
+        <span class="nav-item-icon">📖</span><span>BD Manual & Guide</span>
+      </div>
+    </div>
+  </aside>
+
+  <main id="main-content">
+    <header id="top-nav">
+      <button class="btn btn-icon mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+      <div class="search-box-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="global-search-input" class="search-input" placeholder="Search across all Bangladesh Government (.gov.bd) portals, NID, RJSC, e-Porcha... (Ctrl+K)" oninput="handleSearchInput(this.value)">
+        <span class="search-clear" id="search-clear-btn" onclick="clearSearch()">✕</span>
+      </div>
+      <div class="top-actions">
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span id="offline-status-text">OFFLINE READY</span>
+        </div>
+        <button class="btn btn-bd" onclick="openNewCaseModal()">+ New BD Case</button>
+      </div>
+    </header>
+
+    <div id="view-viewport">
+      <!-- 1. DASHBOARD -->
+      <section id="view-dashboard" class="view-pane active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Verified Gov.bd Endpoints</div>
+            <div class="stat-value" style="color: var(--emerald);">81</div>
+            <div class="stat-spark">🏛️ Direct Ministry & Directorate Systems</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Government Sectors</div>
+            <div class="stat-value" style="color: var(--cyan);">14</div>
+            <div class="stat-spark">📑 Complete National Infrastructure</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">BD Interactive Decoders</div>
+            <div class="stat-value" style="color: var(--amber);">8</div>
+            <div class="stat-spark">⚡ NID, BRN, e-TIN, BRTA, e-Porcha</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">District Geocodes</div>
+            <div class="stat-value" style="color: var(--purple);">64</div>
+            <div class="stat-spark">📍 All 64 Districts Mapped</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin: 24px 0 12px 0;">
+          <h2 style="font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px;">
+            <span>🇧🇩</span> Bangladesh Government Intelligence Categories
+          </h2>
+          <span style="font-size:12px; color:var(--text-dim); font-family:var(--font-mono);">Click category to view portals</span>
+        </div>
+        <div class="boards-grid" id="dashboard-categories-grid"></div>
+      </section>
+
+      <!-- 2. CATALOG -->
+      <section id="view-catalog" class="view-pane">
+        <div class="catalog-controls">
+          <select id="filter-category" class="filter-select" onchange="applyFilters()">
+            <option value="">All 14 Bangladesh Government Sectors</option>
+          </select>
+          <div style="font-size: 12px; font-family: var(--font-mono); color: var(--text-muted);">
+            Showing <span id="catalog-match-count" style="color:var(--emerald); font-weight:700;">81</span> portals
+          </div>
+        </div>
+        <div class="tool-grid" id="catalog-tools-grid"></div>
+      </section>
+
+      <!-- 3. INTERACTIVE ENGINES -->
+      <section id="view-workbench" class="view-pane">
+        <div class="workbench-tabs">
+          <button class="wb-tab active" onclick="switchWorkbenchTab('nid')">🪪 NID & District Geocode</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('brn')">👶 BDRIS Birth Registration</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('tin')">💰 NBR e-TIN & Tax Zone</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('brta')">🚗 BRTA Number Plate Decoder</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('mobile')">📱 BD Mobile Operator (MNO)</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('rjsc')">🏢 RJSC Company Search</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('land')">🗺️ e-Porcha & Khatian Recon</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('dorks')">🔎 Gov.bd Google Dork Studio</button>
+        </div>
+
+        <!-- ENGINE 1: NID -->
+        <div id="wb-pane-nid" class="tool-engine-card">
+          <div class="engine-header">
+            <div class="engine-title">🪪 Bangladesh National ID (Smart NID & Legacy) & District Geocode Decoder</div>
+            <span class="brand-badge">ELECTION COMMISSION</span>
+          </div>
+          <div class="input-grid">
+            <div class="input-group">
+              <label class="input-label">NID Number (10-Digit Smart NID, 13-Digit or 17-Digit Legacy)</label>
+              <input type="text" id="nid-input" class="text-input" placeholder="e.g. 19902612345678901 or 5912345678" maxlength="17" oninput="runNIDDecoder(this.value)">
+            </div>
+            <div class="input-group">
+              <label class="input-label">Citizen Full Name</label>
+              <input type="text" id="nid-name" class="text-input" placeholder="e.g. Mohammad Rahim" oninput="runNIDDecoder()">
+            </div>
+          </div>
+          <div id="nid-results" class="result-box">
+            <div style="color:var(--text-dim); text-align:center;">Enter 10-digit Smart NID or 13/17-digit legacy NID above.</div>
+          </div>
+        </div>
+
+        <!-- ENGINE 2: BRN -->
+        <div id="wb-pane-brn" class="tool-engine-card" style="display:none;">
+          <div class="engine-header">
+            <div class="engine-title">👶 BDRIS 17-Digit Birth Registration Number (BRN) Forensic Parser</div>
+            <span class="brand-badge">BDRIS / LGD</span>
+          </div>
+          <div class="input-grid">
+            <div class="input-group" style="grid-column: 1 / -1;">
+              <label class="input-label">17-Digit Birth Certificate Number (e.g. 19982612345678901)</label>
+              <input type="text" id="brn-input" class="text-input" placeholder="e.g. 20012691234567890" maxlength="17" oninput="runBRNDecoder(this.value)">
+            </div>
+          </div>
+          <div id="brn-results" class="result-box">
+            <div style="color:var(--text-dim); text-align:center;">Enter 17-digit Birth Registration Number to decode Year of Birth, District code, Upazila/Union code, and sequence.</div>
+          </div>
+        </div>
+
+        <!-- ENGINE 3: e-TIN -->
+        <div id="wb-pane-tin" class="tool-engine-card" style="display:none;">
+          <div class="engine-header">
+            <div class="engine-title">💰 NBR 12-Digit e-TIN & Taxpayer Circle/Zone Classifier</div>
+            <span class="brand-badge">NATIONAL BOARD OF REVENUE</span>
+          </div>
+          <div class="input-grid">
+            <div class="input-group" style="grid-column: 1 / -1;">
+              <label class="input-label">12-Digit e-TIN Number</label>
+              <input type="text" id="tin-input" class="text-input" placeholder="e.g. 123456789012" maxlength="12" oninput="runTINValidator(this.value)">
+            </div>
+          </div>
+          <div id="tin-results" class="result-box">
+            <div style="color:var(--text-dim); text-align:center;">Enter 12-digit e-TIN to validate syntax and launch NBR taxpayer verification portals.</div>
+          </div>
+        </div>
+
+        <!-- ENGINE 4: BRTA -->
+        <div id="wb-pane-brta" class="tool-engine-card" style="display:none;">
+          <div class="engine-header">
+            <div class="engine-title">🚗 BRTA Motor Vehicle Registration & Number Plate Series Decoder</div>
+            <span class="brand-badge">BRTA OFFICIAL SPEC</span>
+          </div>
+          <div class="input-grid">
+            <div class="input-group" style="grid-column: 1 / -1;">
+              <label class="input-label">Registration Plate String (e.g. DHAKA METRO-GA-11-2345 or CHATTA METRO-CHA-12-3456)</label>
+              <input type="text" id="brta-input" class="text-input" placeholder="e.g. DHAKA METRO-GA-13-4567" oninput="runBRTAParser(this.value)">
+            </div>
+          </div>
+          <div id="brta-results" class="result-box">
+            <div style="color:var(--text-dim); text-align:center;">Enter vehicle number plate to parse Metropolitan/District authority, vehicle class (Private car, SUV, Microbus, Truck, Bike), and series number.</div>
+          </div>
+        </div>
+
+        <!-- ENGINE 5: MOBILE MNO -->
+        <div id="wb-pane-mobile" class="tool-engine-card" style="display:none;">
+          <div class="engine-header">
+            <div class="engine-title">📱 Bangladesh Mobile Operator (MNO) & Prefix Identifier</div>
+            <span class="brand-badge">BTRC NUMBERING PLAN</span>
+          </div>
+          <div class="input-grid">
+            <div class="input-group" style="grid-column: 1 / -1;">
+              <label class="input-label">Bangladeshi Phone Number (e.g. +880 1712-345678 or 01812345678)</label>
+              <input type="text" id="mobile-input" class="text-input" placeholder="e.g. 01712345678" oninput="runBDMobileParser(this.value)">
+            </div>
+          </div>
+          <div id="mobile-results" class="result-box">
+            <div style="color:var(--text-dim); text-align:center;">Enter Bangladeshi mobile number to detect telecom operator (Grameenphone, Robi, Banglalink, Teletalk, Airtel) and messaging lookups.</div>
+          </div>
+        </div>
+
+        <!-- ENGINE 6: RJSC -->
+        <div id="wb-pane-rjsc" class="tool-engine-card" style="display:none;">
+          <div class="engine-header">
+            <div class="engine-title">🏢 RJSC Company & Commercial Entity Reconnaissance</div>
+            <span class="brand-badge">MINISTRY OF COMMERCE</span>
+          </div>
+          <div class="input-grid">
+            <div class="input-group" style="grid-column: 1 / -1;">
+              <label class="input-label">Company Name / Entity Keyword</label>
+              <input type="text" id="rjsc-input" class="text-input" placeholder="e.g. Beximco or Square Pharmaceuticals" oninput="runRJSCRecon(this.value)">
+            </div>
+          </div>
+          <div id="rjsc-results" class="result-box">
+            <div style="color:var(--text-dim); text-align:center;">Enter company name to generate RJSC entity queries, DSE stock filings, and BIDA records.</div>
+          </div>
+        </div>
+
+        <!-- ENGINE 7: e-PORCHA -->
+        <div id="wb-pane-land" class="tool-engine-card" style="display:none;">
+          <div class="engine-header">
+            <div class="engine-title">🗺️ e-Porcha & Khatian Land Reconnaissance Query Studio</div>
+            <span class="brand-badge">MINISTRY OF LAND</span>
+          </div>
+          <div class="input-grid">
+            <div class="input-group">
+              <label class="input-label">District Name</label>
+              <input type="text" id="land-district" class="text-input" placeholder="e.g. Dhaka or Gazipur" oninput="runLandRecon()">
+            </div>
+            <div class="input-group">
+              <label class="input-label">Upazila / Thana</label>
+              <input type="text" id="land-upazila" class="text-input" placeholder="e.g. Savar or Mirpur" oninput="runLandRecon()">
+            </div>
+            <div class="input-group">
+              <label class="input-label">Mouza Name / JL Number</label>
+              <input type="text" id="land-mouza" class="text-input" placeholder="e.g. Badda JL-12" oninput="runLandRecon()">
+            </div>
+            <div class="input-group">
+              <label class="input-label">Khatian / Dag Number</label>
+              <input type="text" id="land-khatian" class="text-input" placeholder="e.g. RS Khatian 542" oninput="runLandRecon()">
+            </div>
+          </div>
+          <div id="land-results" class="result-box">
+            <div style="color:var(--text-dim); text-align:center;">Enter land particulars to generate deep verification links for e-Porcha, e-Mutation, and LD Tax portals.</div>
+          </div>
+        </div>
+
+        <!-- ENGINE 8: DORKS -->
+        <div id="wb-pane-dorks" class="tool-engine-card" style="display:none;">
+          <div class="engine-header">
+            <div class="engine-title">🔎 Bangladesh Government Dorking Studio (site:.gov.bd)</div>
+            <span class="brand-badge">TARGETED BD RECON</span>
+          </div>
+          <div class="input-grid">
+            <div class="input-group" style="grid-column: 1 / -1;">
+              <label class="input-label">Target Name / Entity / Keyword</label>
+              <input type="text" id="bddork-input" class="text-input" placeholder="e.g. Target Official Name or Company" oninput="runBDDorks(this.value)">
+            </div>
+          </div>
+          <div id="bddork-results" class="result-box">
+            <div style="color:var(--text-dim); text-align:center;">Enter target name to generate high-impact dorks for gazettes, e-GP tenders, court rulings, and government staff lists.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. DOSSIER -->
+      <section id="view-dossier" class="view-pane">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div>
+            <h2 style="font-size:16px; font-weight:800;">📋 Bangladesh Investigation Dossier Studio</h2>
+            <div style="font-size:12px; color:var(--text-dim); font-family:var(--font-mono);">100% Client-Side Encrypted Storage. Zero Telemetry.</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn" onclick="importCaseJSON()">📂 Import JSON</button>
+            <button class="btn btn-bd" onclick="openNewCaseModal()">+ New BD Case</button>
+          </div>
+        </div>
+        <div id="cases-list-container"></div>
+      </section>
+
+      <!-- 5. BOOKMARKS -->
+      <section id="view-bookmarks" class="view-pane">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h2 style="font-size:16px; font-weight:800;">⭐ Pinned Bangladesh Government Portals</h2>
+          <span id="fav-count-text" style="font-size:12px; color:var(--text-dim); font-family:var(--font-mono);">0 pinned</span>
+        </div>
+        <div class="tool-grid" id="favorites-tools-grid"></div>
+      </section>
+
+      <!-- 6. HELP -->
+      <section id="view-help" class="view-pane">
+        <div class="tool-engine-card">
+          <div class="engine-header">
+            <div class="engine-title">📖 BD-OSINT Apex Field Manual & Sourcing Guide</div>
+            <span class="brand-badge">GOVT DIRECT SOURCING</span>
+          </div>
+          <div style="line-height:1.7; font-size:13px; color:var(--text-muted);">
+            <h3 style="color:var(--emerald); margin: 12px 0 6px 0;">🏛️ Direct Bangladesh Government Sourcing</h3>
+            <p>Every single portal and endpoint in this repository is directly sourced from official Bangladesh Government authorities (<code>.gov.bd</code>), statutory regulatory bodies (Bangladesh Bank, BTRC, NBR, BSEC), judicial repositories (Supreme Court), and national educational councils (UGC, BMDC, ICAB).</p>
+
+            <h3 style="color:var(--cyan); margin: 18px 0 6px 0;">📱 Mobile PWA Installation</h3>
+            <p>Install this workbench as a native app on your phone:</p>
+            <ul style="margin-left:20px; margin-top:4px;">
+              <li><strong>iOS (Safari):</strong> Tap <strong>Share</strong> &gt; <strong>"Add to Home Screen"</strong>.</li>
+              <li><strong>Android:</strong> Tap <strong>Menu (⋮)</strong> &gt; <strong>"Install App"</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<nav id="mobile-dock">
+  <button class="dock-btn active" onclick="switchView('dashboard')"><span class="dock-icon">📊</span><span>Home</span></button>
+  <button class="dock-btn" onclick="switchView('catalog')"><span class="dock-icon">🔍</span><span>Portals</span></button>
+  <button class="dock-btn" onclick="switchView('workbench')"><span class="dock-icon">⚡</span><span>Engines</span></button>
+  <button class="dock-btn" onclick="switchView('dossier')"><span class="dock-icon">📋</span><span>Dossier</span></button>
+  <button class="dock-btn" onclick="switchView('bookmarks')"><span class="dock-icon">⭐</span><span>Pinned</span></button>
+</nav>
+
+<!-- CASE MODAL -->
+<div id="case-modal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div style="font-weight:700; font-size:14px;">📋 Create New Bangladesh Investigation Case</div>
+      <button class="btn btn-icon" onclick="closeModal('case-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="input-grid">
+        <div class="input-group" style="grid-column: 1 / -1;">
+          <label class="input-label">Case Title / Target Name</label>
+          <input type="text" id="new-case-title" class="text-input" placeholder="e.g. Land Title Investigation - Dhaka Mouza 45">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Classification Level</label>
+          <select id="new-case-class" class="text-input">
+            <option value="UNCLASSIFIED">OSINT - UNCLASSIFIED</option>
+            <option value="CONFIDENTIAL">CONFIDENTIAL</option>
+            <option value="SECRET">SECRET</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Investigation Type</label>
+          <select id="new-case-type" class="text-input">
+            <option value="Citizen">Individual Citizen (NID/Passport)</option>
+            <option value="Corporate">Corporate / RJSC Company</option>
+            <option value="Land">Land Record & Mutation</option>
+            <option value="Financial">Tax / NBR / Financial Fraud</option>
+          </select>
+        </div>
+        <div class="input-group" style="grid-column: 1 / -1;">
+          <label class="input-label">Initial Objective & Notes</label>
+          <textarea id="new-case-notes" class="text-input" style="height:70px; padding:8px 12px;" placeholder="Outline the investigation leads, known NID, phone numbers, or corporate registrations..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('case-modal')">Cancel</button>
+      <button class="btn btn-bd" onclick="saveNewCase()">Create Dossier</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<input type="file" id="case-import-input" accept=".json" style="display:none;" onchange="handleCaseFileSelect(event)">
+
+<script>
+// SERVICE WORKER
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then((reg) => {
+      console.log('[SW] BD-OSINT Service Worker Registered:', reg.scope);
+    }).catch(err => console.log('[SW] Registration failed:', err));
+  });
+}
+
+// DATABASE
+const BD_DIRECTORIES = [
+  {
+    "category": "National Identity, Voter & Citizen Registry",
+    "icon": "\ud83e\udeaa",
+    "desc": "Official citizen identity, election commission voter rolls, birth registration & passport tracking",
+    "tools": [
+      {
+        "title": "Bangladesh Election Commission - NID Wing Portal",
+        "url": "https://services.nidw.gov.bd/nid-pub/",
+        "desc": "Official citizen portal for National Identity Card (Smart NID) registration, verification, profile update and digital voter card reissue."
+      },
+      {
+        "title": "ECS Bangladesh - Election Commission Official Site",
+        "url": "https://www.ecs.gov.bd/",
+        "desc": "Official portal of Bangladesh Election Commission hosting electoral roll statistics, gazettes, election results, and candidate affidavits."
+      },
+      {
+        "title": "BDRIS - Birth & Death Registration Verification",
+        "url": "https://everify.bdris.gov.bd/",
+        "desc": "Official 17-digit Birth Registration Number (BRN) and Death Certificate online verification portal under Local Government Division."
+      },
+      {
+        "title": "BDRIS Citizen Portal",
+        "url": "https://bdris.gov.bd/",
+        "desc": "Online application, tracking, and correction portal for Birth & Death certificates across all Union Parishads, Municipalities, and City Corporations."
+      },
+      {
+        "title": "e-Passport Online Registration & Application Status",
+        "url": "https://epassport.gov.bd/authorization/application-status",
+        "desc": "Real-time tracking of Bangladeshi e-Passport applications using Application ID or Online Registration ID (OID)."
+      },
+      {
+        "title": "Department of Immigration and Passports (DIP)",
+        "url": "https://www.passport.gov.bd/",
+        "desc": "Official portal of the Department of Immigration & Passports for Machine Readable Passports (MRP), regional passport office jurisdictions, and circulars."
+      },
+      {
+        "title": "Bangladesh e-Visa Online Portal",
+        "url": "https://www.visa.gov.bd/",
+        "desc": "Government portal for foreigner visa processing, consular security clearances, and entry tracking."
+      },
+      {
+        "title": "Universal Pension Scheme (Prottoy / Probas / Progoti / Surokkha)",
+        "url": "https://www.upension.gov.bd/",
+        "desc": "National Pension Authority citizen registry for expatriate, private sector, informal, and low-income citizen pension enrollment."
+      }
+    ]
+  },
+  {
+    "category": "Corporate, Companies & Trade Registries",
+    "icon": "\ud83c\udfe2",
+    "desc": "RJSC corporate entity records, BIDA investment clearances, DSE stock filings & export directories",
+    "tools": [
+      {
+        "title": "RJSC - Registrar of Joint Stock Companies & Firms",
+        "url": "https://roc.gov.bd/",
+        "desc": "Official statutory body registering all Private Limited, Public Limited, Foreign Branch, Partnership, and Society entities in Bangladesh."
+      },
+      {
+        "title": "RJSC Entity Search & Name Clearance Service",
+        "url": "https://app.roc.gov.bd/",
+        "desc": "Live company search by registration number, incorporation date, company name, director particulars, and certified filings."
+      },
+      {
+        "title": "Dhaka Stock Exchange (DSE) Listed Company Profiles",
+        "url": "https://dsebd.org/company_listing.php",
+        "desc": "Complete financial statements, board of directors list, major shareholding patterns, and material disclosures for all DSE listed companies."
+      },
+      {
+        "title": "Chittagong Stock Exchange (CSE)",
+        "url": "https://www.cse.com.bd/",
+        "desc": "Port city stock exchange financial market disclosures, listed corporate entities, and trade tracking."
+      },
+      {
+        "title": "BIDA - Bangladesh Investment Development Authority",
+        "url": "https://bida.gov.bd/",
+        "desc": "Principal investment promotion agency under the Prime Minister's Office tracking foreign direct investments, industrial registrations, and approvals."
+      },
+      {
+        "title": "BIDA One Stop Service (OSS) Portal",
+        "url": "https://bidaquickservices.gov.bd/",
+        "desc": "Unified investor clearance platform coordinating 50+ government agencies for trade licenses, factory permits, and utility connections."
+      },
+      {
+        "title": "Export Promotion Bureau (EPB) Exporters Directory",
+        "url": "https://epb.gov.bd/",
+        "desc": "National database of registered exporters, export commodity statistics, HS code allocations, and international trade fair authorizations."
+      },
+      {
+        "title": "FBCCI - Federation of Bangladesh Chambers of Commerce",
+        "url": "https://fbcci.org/",
+        "desc": "Apex trade organization directory representing all 64 district chambers of commerce and specialized national trade associations."
+      },
+      {
+        "title": "Dhaka Chamber of Commerce & Industry (DCCI)",
+        "url": "https://www.dhakachamber.com/",
+        "desc": "Corporate member registry, trade delegation archives, and business intelligence repository for greater Dhaka enterprises."
+      },
+      {
+        "title": "BSCIC - Small and Cottage Industries Corporation",
+        "url": "http://www.bscic.gov.bd/",
+        "desc": "Directory of small & medium enterprises (SMEs), industrial estate plots, and handicraft business registrations."
+      }
+    ]
+  },
+  {
+    "category": "Taxation, Revenue, Customs & NBR",
+    "icon": "\ud83d\udcb0",
+    "desc": "National Board of Revenue e-TIN lookups, VAT BIN registration, Customs ASYCUDA & tax return status",
+    "tools": [
+      {
+        "title": "NBR e-Tax & Online Income Tax Return System",
+        "url": "https://incometax.gov.bd/",
+        "desc": "National Board of Revenue online taxpayer filing portal, e-Return verification, and tax clearance acknowledgment certificates."
+      },
+      {
+        "title": "NBR e-TIN Registration & Verification Portal",
+        "url": "https://secure.incometax.gov.bd/TINHome",
+        "desc": "12-digit Taxpayer Identification Number (e-TIN) database, registration status verification, and Tax Zone / Circle mapping."
+      },
+      {
+        "title": "VAT Online System (IVAS) & BIN Verification",
+        "url": "https://vat.gov.bd/",
+        "desc": "Official 9-digit Business Identification Number (BIN) lookup, VAT registration certificates, and monthly return compliance status."
+      },
+      {
+        "title": "Bangladesh Customs & ASYCUDA World System",
+        "url": "https://www.bangladeshcustoms.gov.bd/",
+        "desc": "National customs tariff schedules, Bill of Entry tracking, HS code classification, and customs clearing agent registry."
+      },
+      {
+        "title": "National Single Window (NSW) Bangladesh",
+        "url": "https://nsw.gov.bd/",
+        "desc": "Inter-agency cross-border trade clearance portal connecting customs, commercial banks, quarantine, and port authorities."
+      },
+      {
+        "title": "NBR Official Portal & SRO Notifications",
+        "url": "https://nbr.gov.bd/",
+        "desc": "Statutory Regulatory Orders (SROs), tax circulars, fiscal policy documents, and top taxpayer award lists."
+      }
+    ]
+  },
+  {
+    "category": "Land Records, Survey, e-Porcha & Mutation",
+    "icon": "\ud83d\uddfa\ufe0f",
+    "desc": "e-Porcha Khatian land records, namjari mutation, land tax (Khajna) & RAJUK master planning",
+    "tools": [
+      {
+        "title": "e-Porcha - National Land Records & Khatian Search",
+        "url": "https://eporcha.gov.bd/",
+        "desc": "Official portal of Department of Land Records & Surveys (DLRS) to search CS, SA, RS, BS, and City Survey khatians, Mouza maps, and record of rights."
+      },
+      {
+        "title": "e-Mutation (Namjari) Citizen Portal",
+        "url": "https://mutation.land.gov.bd/",
+        "desc": "Online land mutation application tracking, AC Land hearing notices, DCR verification, and corrected mutation khatian downloads."
+      },
+      {
+        "title": "LD Tax - Land Development Tax (Khajna) System",
+        "url": "https://ldtax.gov.bd/",
+        "desc": "Ministry of Land holding tax calculation, digital land tax payment receipts, and owner holding ledger verification."
+      },
+      {
+        "title": "Ministry of Land National Portal",
+        "url": "https://minland.gov.bd/",
+        "desc": "Central policy authority for Khas land distribution, vested property administration, and land acquisition gazettes."
+      },
+      {
+        "title": "RAJUK - Capital Development Authority (Dhaka)",
+        "url": "https://www.rajuk.gov.bd/",
+        "desc": "Dhaka metropolitan master plan, building construction approval verification, land use clearance certificates, and Uttara/Purbachal project records."
+      },
+      {
+        "title": "Chittagong Development Authority (CDA)",
+        "url": "http://www.cda.gov.bd/",
+        "desc": "Chittagong metropolitan building approvals, master development schemes, and commercial zone clearances."
+      },
+      {
+        "title": "Rajshahi Development Authority (RDA)",
+        "url": "http://www.rda.gov.bd/",
+        "desc": "Rajshahi city development layout plans, plot allocations, and zoning permits."
+      },
+      {
+        "title": "Khulna Development Authority (KDA)",
+        "url": "http://www.kda.gov.bd/",
+        "desc": "Khulna industrial and residential layout approvals and land management."
+      }
+    ]
+  },
+  {
+    "category": "Vehicles, Transport & Driving Licenses (BRTA)",
+    "icon": "\ud83d\ude97",
+    "desc": "BRTA driving license validation, motor vehicle registration, number plate analysis & railway logs",
+    "tools": [
+      {
+        "title": "BRTA Service Portal (BSP)",
+        "url": "https://bsp.brta.gov.bd/",
+        "desc": "Official citizen portal for Bangladesh Road Transport Authority: Smart Card Driving License verification, learner tracking, and motor vehicle tax tokens."
+      },
+      {
+        "title": "BRTA Official Portal & Motor Vehicle Rules",
+        "url": "https://brta.gov.bd/",
+        "desc": "Vehicle registration guidelines, fitness certificate rules, retro-reflective digital number plate specifications, and route permit registries."
+      },
+      {
+        "title": "Bangladesh Railway e-Ticketing System",
+        "url": "https://eticket.railway.gov.bd/",
+        "desc": "National passenger train schedule, PNR ticket verification, seat availability, and train station route intelligence."
+      },
+      {
+        "title": "Civil Aviation Authority of Bangladesh (CAAB)",
+        "url": "http://www.caab.gov.bd/",
+        "desc": "Registered aircraft tails, commercial airline operators, air operator certificates (AOC), and airport infrastructure data."
+      }
+    ]
+  },
+  {
+    "category": "Judiciary, Supreme Court & Law Enforcement",
+    "icon": "\u2696\ufe0f",
+    "desc": "Supreme Court cause lists, bdlaws codified acts, district courts, online GD & police clearance",
+    "tools": [
+      {
+        "title": "Supreme Court of Bangladesh - Cause Lists & Judgments",
+        "url": "https://supremecourt.gov.bd/",
+        "desc": "Official online daily cause lists, full bench reported judgments, case status lookup, and lawyer roster for Appellate and High Court Divisions."
+      },
+      {
+        "title": "Laws of Bangladesh (bdlaws.minlaw.gov.bd)",
+        "url": "http://bdlaws.minlaw.gov.bd/",
+        "desc": "Official repository of all codified Acts of Parliament, Ordinances, Regulations, and Chronological Index of Bangladesh legislation from 1836 to date."
+      },
+      {
+        "title": "e-Judiciary District Courts Daily Cause List",
+        "url": "http://causelist.judiciary.gov.bd/",
+        "desc": "Real-time daily case cause lists, court schedules, and hearing outcomes for all 64 District and Sessions Judge Courts."
+      },
+      {
+        "title": "Bangladesh Police Online General Diary (Online GD)",
+        "url": "https://onlinegd.police.gov.bd/",
+        "desc": "National online portal to file and verify General Diary (GD) reports for lost documents, security threats, and identity theft."
+      },
+      {
+        "title": "Police Clearance Certificate Online Verification",
+        "url": "https://pcc.police.gov.bd/pcc-sub/",
+        "desc": "Verification portal for Police Clearance Certificates issued by Special Branch (SB) and District Police Superintendents."
+      },
+      {
+        "title": "Bangladesh Police Official Portal",
+        "url": "https://www.police.gov.bd/",
+        "desc": "Directory of all Thana/Police Stations, Range DIG offices, Metropolitan Police headquarters, and emergency contact registries."
+      },
+      {
+        "title": "CID Cyber Police Centre (CPC) Bangladesh",
+        "url": "https://cid.gov.bd/",
+        "desc": "Criminal Investigation Department cyber crime reporting, financial fraud investigation unit, and forensic lab advisories."
+      },
+      {
+        "title": "Rapid Action Battalion (RAB) Press & Bulletin Portal",
+        "url": "https://rab.gov.bd/",
+        "desc": "Specialized elite security force press releases, recovered contraband reports, and public wanted advisories."
+      },
+      {
+        "title": "Anti-Corruption Commission (ACC / DUDOK)",
+        "url": "http://acc.org.bd/",
+        "desc": "Statutory anti-corruption authority public charge sheets, asset probe notices, institutional inquiry reports, and whistleblower hotlines."
+      }
+    ]
+  },
+  {
+    "category": "Central Banking, FININT, Sanctions & BFIU",
+    "icon": "\ud83c\udfe6",
+    "desc": "Bangladesh Bank authorized banks, BFIU AML/CFT sanctions, MRA NGO MFIs & SEC market regulators",
+    "tools": [
+      {
+        "title": "Bangladesh Bank (Central Bank Official Portal)",
+        "url": "https://www.bb.org.bd/",
+        "desc": "Central bank regulatory directives, scheduled commercial banks directory, non-bank financial institutions (NBFIs), and authorized money changers."
+      },
+      {
+        "title": "Bangladesh Financial Intelligence Unit (BFIU)",
+        "url": "https://www.bfiu.org.bd/",
+        "desc": "National agency responsible for analyzing Suspicious Transaction Reports (STRs), Cash Transaction Reports (CTRs), and enforcing UN Sanction Lists."
+      },
+      {
+        "title": "Bangladesh Securities & Exchange Commission (BSEC)",
+        "url": "https://sec.gov.bd/",
+        "desc": "Capital market regulatory orders, listed company IPO approvals, penalty orders, and licensed merchant bank directories."
+      },
+      {
+        "title": "Microcredit Regulatory Authority (MRA)",
+        "url": "http://www.mra.gov.bd/",
+        "desc": "Licensing authority and official registry of all approved Microfinance Institutions (MFIs) and NGO credit operations in Bangladesh."
+      },
+      {
+        "title": "Insurance Development & Regulatory Authority (IDRA)",
+        "url": "http://www.idra.org.bd/",
+        "desc": "Statutory registry of authorized life and general insurance companies, insurance agent licenses, and financial compliance audits."
+      }
+    ]
+  },
+  {
+    "category": "Telecom, Cyber Infrastructure & CIRT",
+    "icon": "\ud83d\udce1",
+    "desc": "BTRC licensed ISPs, BGD e-GOV CIRT threat intelligence, BTCL .bd domain registry & mobile operators",
+    "tools": [
+      {
+        "title": "BTRC - Telecommunication Regulatory Commission",
+        "url": "https://btrc.gov.bd/",
+        "desc": "Official telecom regulator licensing directory for ISPs, Nationwide Telecommunication Transmission Network (NTTN), IPTSP, and tower sharing."
+      },
+      {
+        "title": "BGD e-GOV CIRT (National Cyber Incident Response Team)",
+        "url": "https://www.cirt.gov.bd/",
+        "desc": "National cybersecurity agency providing critical infrastructure vulnerability advisories, malware analyses, and incident response reports."
+      },
+      {
+        "title": "BTCL .bd & .bangla ccTLD Domain Registry",
+        "url": "https://btcl.com.bd/",
+        "desc": "State telecom operator managing top-level country code domains (.com.bd, .gov.bd, .edu.bd, .org.bd, .net.bd) and landline phone registries."
+      },
+      {
+        "title": "Bangladesh Computer Council (BCC)",
+        "url": "https://bcc.gov.bd/",
+        "desc": "National Data Center infrastructure, Tier-III / Tier-IV government cloud hosting, and national digital infrastructure standards."
+      }
+    ]
+  },
+  {
+    "category": "Academic, Education & Professional Councils",
+    "icon": "\ud83c\udf93",
+    "desc": "UGC university approvals, BANBEIS EIIN school database, BMDC medical licenses & Bar Council advocates",
+    "tools": [
+      {
+        "title": "University Grants Commission (UGC) Recognized Universities",
+        "url": "http://www.ugc.gov.bd/",
+        "desc": "Official statutory registry of 55+ Public Universities, 110+ Private Approved Universities, and unauthorized campus advisories."
+      },
+      {
+        "title": "National Education Board Examination Results",
+        "url": "http://www.educationboardresults.gov.bd/",
+        "desc": "Official portal for Secondary School Certificate (SSC), Higher Secondary Certificate (HSC), Dakhil, and Vocational public exam results."
+      },
+      {
+        "title": "BANBEIS - Educational Institute Directory (EIIN Lookup)",
+        "url": "http://www.banbeis.gov.bd/",
+        "desc": "Bureau of Educational Information & Statistics: complete national database of all schools, colleges, and madrasas searchable by 6-digit EIIN."
+      },
+      {
+        "title": "BMDC - Bangladesh Medical & Dental Council",
+        "url": "https://bmdc.org.bd/",
+        "desc": "Statutory body verifying registered medical doctors, dental surgeons, specialist qualifications, and unrecognized medical college notices."
+      },
+      {
+        "title": "Bangladesh Bar Council - Advocates Registry",
+        "url": "http://www.barcouncil.gov.bd/",
+        "desc": "Official enrolled advocates directory, High Court Division permission lists, and legal professional conduct records."
+      },
+      {
+        "title": "ICAB - Institute of Chartered Accountants (DVS System)",
+        "url": "https://www.icab.org.bd/",
+        "desc": "Document Verification System (DVS) to verify audited corporate financial statements and registered Chartered Accountancy audit firms."
+      },
+      {
+        "title": "Institution of Engineers, Bangladesh (IEB)",
+        "url": "https://www.iebbd.org/",
+        "desc": "National professional organization registry of accredited professional and chartered engineers."
+      }
+    ]
+  },
+  {
+    "category": "Gazettes, Public Procurement & Govt Officers",
+    "icon": "\ud83d\udcdc",
+    "desc": "BG Press extraordinary gazettes, e-GP government tenders, Cabinet division & BCS gradation lists",
+    "tools": [
+      {
+        "title": "BG Press - Bangladesh National & Extraordinary Gazettes",
+        "url": "http://www.dpp.gov.bd/bgpress/",
+        "desc": "Department of Printing and Publications: searchable archives of the Bangladesh Gazette, ministerial SROs, cadre promotions, and land acquisitions."
+      },
+      {
+        "title": "e-GP (National e-Government Procurement Portal)",
+        "url": "https://www.eprocure.gov.bd/",
+        "desc": "Central government tender portal to search published tenders, contract award values, participating contractors, and blacklisted vendors."
+      },
+      {
+        "title": "Cabinet Division - Government of Bangladesh",
+        "url": "https://cabinet.gov.bd/",
+        "desc": "Official directory of Cabinet Ministers, State Ministers, Senior Secretaries, Warrant of Precedence, and inter-ministerial allocation of business."
+      },
+      {
+        "title": "Ministry of Public Administration (MOPA)",
+        "url": "https://mopa.gov.bd/",
+        "desc": "Civil service personnel management, BCS Administration Cadre officer gradation lists, posting orders, and transfer circulars."
+      },
+      {
+        "title": "Bangladesh Public Service Commission (BPSC)",
+        "url": "http://www.bpsc.gov.bd/",
+        "desc": "Civil service recruitment examination notifications, non-cadre job circulars, and merit list announcements."
+      }
+    ]
+  },
+  {
+    "category": "Health, Pharmaceuticals & Drug Administration",
+    "icon": "\ud83d\udc8a",
+    "desc": "DGDA pharmaceutical brand registrations, DGHS licensed hospitals & Surokkha verification",
+    "tools": [
+      {
+        "title": "DGDA - Directorate General of Drug Administration",
+        "url": "https://dgda.gov.bd/",
+        "desc": "National drug regulatory authority database of registered allopathic, herbal, and unani pharmaceutical products, prices, and licensed manufacturers."
+      },
+      {
+        "title": "DGHS - Directorate General of Health Services",
+        "url": "http://dghs.gov.bd/",
+        "desc": "Directory of all government and licensed private hospitals, diagnostic centers, medical colleges, and health facilities across Bangladesh."
+      },
+      {
+        "title": "Surokkha - National COVID/Vaccine Verification Portal",
+        "url": "https://surokkha.gov.bd/",
+        "desc": "Official citizen vaccine certificate download, verification, and immunization tracking portal."
+      }
+    ]
+  },
+  {
+    "category": "NGOs, Non-Profit & Social Welfare Registries",
+    "icon": "\ud83e\udd1d",
+    "desc": "NGO Affairs Bureau foreign-funded NGO clearances & Department of Social Services registries",
+    "tools": [
+      {
+        "title": "NGO Affairs Bureau (Prime Minister's Office)",
+        "url": "http://www.ngoab.gov.bd/",
+        "desc": "Statutory body governing all foreign-funded NGOs operating in Bangladesh, project approval lists, FD-6/FD-7 clearances, and executive boards."
+      },
+      {
+        "title": "Department of Social Services (DSS)",
+        "url": "http://www.dss.gov.bd/",
+        "desc": "Voluntary social welfare organization registrations, orphanages, disability registries, and social safety net beneficiary tracking."
+      }
+    ]
+  },
+  {
+    "category": "Geospatial, Maritime, Weather & Ports",
+    "icon": "\u2693",
+    "desc": "Survey of Bangladesh maps, BMD cyclone radars, Chittagong/Mongla port vessels & BIWTA waterways",
+    "tools": [
+      {
+        "title": "Survey of Bangladesh (SOB) - National Mapping Agency",
+        "url": "http://www.sob.gov.bd/",
+        "desc": "National geodetic reference system, topographic quadrangle sheets, digital elevation models, and administrative boundary datasets."
+      },
+      {
+        "title": "Bangladesh Meteorological Department (BMD)",
+        "url": "https://bmd.gov.bd/",
+        "desc": "National weather forecasting, Doppler radar imagery, cyclone tracking bulletins, rainfall measurements, and earthquake monitoring."
+      },
+      {
+        "title": "Flood Forecasting and Warning Centre (FFWC)",
+        "url": "http://www.ffwc.gov.bd/",
+        "desc": "Real-time river water level monitoring across 100+ stations, flood inundation modeling, and transboundary water flow data."
+      },
+      {
+        "title": "SPARRSO - Space Research & Remote Sensing",
+        "url": "http://www.sparrso.gov.bd/",
+        "desc": "National satellite remote sensing applications, agricultural crop monitoring, forest coverage, and coastal morphology mapping."
+      },
+      {
+        "title": "Chittagong Port Authority (CPA) - Vessel Traffic",
+        "url": "https://cpa.gov.bd/",
+        "desc": "Primary maritime sea port berthing schedules, container tracking, harbor master movements, and maritime shipping lines."
+      },
+      {
+        "title": "Mongla Port Authority (MPA)",
+        "url": "http://www.mpa.gov.bd/",
+        "desc": "Second sea port cargo schedules, vessel anchorage records, and maritime freight clearances."
+      },
+      {
+        "title": "BIWTA - Inland Water Transport Authority",
+        "url": "http://www.biwta.gov.bd/",
+        "desc": "River routes, launch and ferry schedule databases, inland river port terminals, and river dredging hydrographic surveys."
+      }
+    ]
+  },
+  {
+    "category": "Media, Newspapers & Press Council",
+    "icon": "\ud83d\udcf0",
+    "desc": "Ministry of Information accredited press, DFP media listings & Bangladesh Press Council",
+    "tools": [
+      {
+        "title": "Ministry of Information & Broadcasting (MOI)",
+        "url": "https://moi.gov.bd/",
+        "desc": "Official registry of approved private satellite television channels, FM radio stations, online news portals, and press accreditations."
+      },
+      {
+        "title": "Department of Films & Publications (DFP) Media List",
+        "url": "http://www.dfp.gov.bd/",
+        "desc": "Audit bureau media listed daily newspapers, certified circulation numbers, government advertisement rate classifications."
+      },
+      {
+        "title": "Bangladesh Press Council",
+        "url": "http://presscouncil.gov.bd/",
+        "desc": "Statutory quasi-judicial body adjudicating journalistic ethics complaints, media defamation matters, and accredited journalist rolls."
+      }
+    ]
+  }
+];
+
+// Flatten tools list
+let ALL_BD_TOOLS = [];
+BD_DIRECTORIES.forEach((cat, catIdx) => {
+  cat.tools.forEach((t, tIdx) => {
+    ALL_BD_TOOLS.push({
+      id: ALL_BD_TOOLS.length + 1,
+      cat_name: cat.category,
+      cat_icon: cat.icon,
+      cat_idx: catIdx,
+      title: t.title,
+      url: t.url,
+      desc: t.desc
+    });
+  });
+});
+
+let activeView = 'dashboard';
+let activeWorkbench = 'nid';
+let favorites = JSON.parse(localStorage.getItem('bdosint_favs') || '[]');
+let cases = JSON.parse(localStorage.getItem('bdosint_cases') || '[]');
+let filteredIndices = [];
+
+// INITIALIZATION
+window.addEventListener('DOMContentLoaded', () => {
+  renderSidebarCategories();
+  renderDashboardCategories();
+  populateCategoryFilter();
+  applyFilters();
+  updateCaseBadge();
+  updateFavBadge();
+
+  window.addEventListener('online', updateNetworkStatus);
+  window.addEventListener('offline', updateNetworkStatus);
+  updateNetworkStatus();
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement !== document.getElementById('global-search-input')) {
+      e.preventDefault();
+      document.getElementById('global-search-input').focus();
+    }
+  });
+});
+
+function updateNetworkStatus() {
+  const badge = document.getElementById('offline-status-text');
+  if (navigator.onLine) {
+    badge.innerText = 'ONLINE / PWA';
+    badge.style.color = 'var(--emerald)';
+  } else {
+    badge.innerText = 'OFFLINE MODE';
+    badge.style.color = 'var(--amber)';
+  }
+}
+
+function showToast(msg, icon = '🇧🇩') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    setTimeout(() => toast.remove(), 200);
+  }, 2800);
+}
+
+function copyToClipboard(text, toolTitle = '') {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast(toolTitle ? `Copied: ${toolTitle}` : `Copied to clipboard!`, '📋');
+    }).catch(() => fallbackCopy(text, toolTitle));
+  } else {
+    fallbackCopy(text, toolTitle);
+  }
+}
+
+function fallbackCopy(text, toolTitle = '') {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.style.position = "fixed";
+  textArea.style.left = "-999999px";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    document.execCommand('copy');
+    showToast(toolTitle ? `Copied: ${toolTitle}` : `Copied to clipboard!`, '📋');
+  } catch (err) {
+    showToast('Failed to copy', '⚠️');
+  }
+  document.body.removeChild(textArea);
+}
+
+function launchTool(url, title, e) {
+  if (e) e.stopPropagation();
+  copyToClipboard(url, title);
+  try {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  } catch (err) {
+    console.warn('Popup blocked, copied to clipboard.');
+  }
+}
+
+function renderSidebarCategories() {
+  const container = document.getElementById('sidebar-categories-list');
+  let html = '';
+  BD_DIRECTORIES.forEach((cat, idx) => {
+    html += `
+      <div class="nav-item" onclick="filterByCategoryIndex(${idx})">
+        <span class="nav-item-icon">${cat.icon}</span>
+        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(cat.category)}</span>
+        <span class="nav-item-count">${cat.tools.length}</span>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function renderDashboardCategories() {
+  const container = document.getElementById('dashboard-categories-grid');
+  let html = '';
+  BD_DIRECTORIES.forEach((cat, idx) => {
+    html += `
+      <div class="board-card" onclick="filterByCategoryIndex(${idx})">
+        <div class="board-card-header">
+          <div class="board-card-title">${cat.icon} ${escapeHtml(cat.category)}</div>
+          <span class="board-card-count">${cat.tools.length} Portals</span>
+        </div>
+        <div class="board-card-desc">${escapeHtml(cat.desc)}</div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function populateCategoryFilter() {
+  const select = document.getElementById('filter-category');
+  BD_DIRECTORIES.forEach((cat, idx) => {
+    const opt = document.createElement('option');
+    opt.value = idx;
+    opt.innerText = `${cat.icon} ${cat.category}`;
+    select.appendChild(opt);
+  });
+}
+
+function handleSearchInput(query) {
+  const clearBtn = document.getElementById('search-clear-btn');
+  clearBtn.style.display = query ? 'block' : 'none';
+  if (activeView !== 'catalog') switchView('catalog');
+  applyFilters();
+}
+
+function clearSearch() {
+  const input = document.getElementById('global-search-input');
+  input.value = '';
+  document.getElementById('search-clear-btn').style.display = 'none';
+  applyFilters();
+}
+
+function filterByCategoryIndex(idx) {
+  switchView('catalog');
+  document.getElementById('filter-category').value = idx;
+  document.getElementById('global-search-input').value = '';
+  applyFilters();
+}
+
+function applyFilters() {
+  const query = (document.getElementById('global-search-input').value || '').trim().toLowerCase();
+  const catVal = document.getElementById('filter-category').value;
+  const catIdx = catVal !== '' ? parseInt(catVal, 10) : -1;
+
+  filteredIndices = [];
+  ALL_BD_TOOLS.forEach((t, i) => {
+    if (catIdx >= 0 && t.cat_idx !== catIdx) return;
+    if (query) {
+      const matchText = (t.title + ' ' + t.cat_name + ' ' + t.desc + ' ' + t.url).toLowerCase();
+      if (!matchText.includes(query)) return;
+    }
+    filteredIndices.push(i);
+  });
+
+  document.getElementById('catalog-match-count').innerText = filteredIndices.length;
+  renderCatalogTools();
+}
+
+function renderCatalogTools() {
+  const container = document.getElementById('catalog-tools-grid');
+  if (filteredIndices.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-dim);">
+        <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+        <div style="font-size: 14px; font-weight: 700;">No government portals found</div>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  filteredIndices.forEach(idx => {
+    const t = ALL_BD_TOOLS[idx];
+    const isFav = favorites.includes(t.id);
+    html += `
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <div class="tool-card-info">
+            <span class="tool-meta-badge">${t.cat_icon} ${escapeHtml(t.cat_name)}</span>
+            <div class="tool-title">${escapeHtml(t.title)}</div>
+            <div class="tool-desc">${escapeHtml(t.desc)}</div>
+          </div>
+          <button class="btn btn-icon" style="height:26px; width:26px; font-size:12px; color: ${isFav ? 'var(--amber)' : 'var(--text-dim)'};" onclick="toggleFavorite(${t.id}, event)">
+            ${isFav ? '★' : '☆'}
+          </button>
+        </div>
+        <div class="tool-card-actions">
+          <span class="tool-url-preview" title="${escapeHtml(t.url)}">${escapeHtml(t.url.replace(/^https?:\\/\\//, ''))}</span>
+          <button class="btn btn-icon" style="height:26px; width:26px;" onclick="copyToClipboard('${escapeJs(t.url)}', '${escapeJs(t.title)}', event)">📋</button>
+          <button class="btn btn-bd" style="height:26px; padding:0 8px; font-size:11px;" onclick="launchTool('${escapeJs(t.url)}', '${escapeJs(t.title)}', event)">🏛️ Open Portal</button>
+        </div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function toggleFavorite(id, e) {
+  if (e) e.stopPropagation();
+  const idx = favorites.indexOf(id);
+  if (idx >= 0) {
+    favorites.splice(idx, 1);
+    showToast('Unpinned from favorites', '⭐');
+  } else {
+    favorites.push(id);
+    showToast('Pinned to quick access!', '⭐');
+  }
+  localStorage.setItem('bdosint_favs', JSON.stringify(favorites));
+  updateFavBadge();
+  if (activeView === 'catalog') renderCatalogTools();
+  if (activeView === 'bookmarks') renderFavoritesView();
+}
+
+function updateFavBadge() {
+  document.getElementById('fav-count-badge').innerText = favorites.length;
+}
+
+function renderFavoritesView() {
+  const container = document.getElementById('favorites-tools-grid');
+  document.getElementById('fav-count-text').innerText = `${favorites.length} pinned portals`;
+  if (favorites.length === 0) {
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-dim);">No pinned portals yet. Click the star on any portal card to pin it.</div>`;
+    return;
+  }
+  let html = '';
+  favorites.forEach(id => {
+    const t = ALL_BD_TOOLS.find(x => x.id === id);
+    if (!t) return;
+    html += `
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <div class="tool-card-info">
+            <span class="tool-meta-badge">${t.cat_icon} ${escapeHtml(t.cat_name)}</span>
+            <div class="tool-title">${escapeHtml(t.title)}</div>
+            <div class="tool-desc">${escapeHtml(t.desc)}</div>
+          </div>
+          <button class="btn btn-icon" style="height:26px; width:26px; color:var(--amber);" onclick="toggleFavorite(${t.id}, event)">★</button>
+        </div>
+        <div class="tool-card-actions">
+          <span class="tool-url-preview">${escapeHtml(t.url.replace(/^https?:\\/\\//, ''))}</span>
+          <button class="btn btn-icon" style="height:26px; width:26px;" onclick="copyToClipboard('${escapeJs(t.url)}', '${escapeJs(t.title)}', event)">📋</button>
+          <button class="btn btn-bd" style="height:26px; padding:0 8px; font-size:11px;" onclick="launchTool('${escapeJs(t.url)}', '${escapeJs(t.title)}', event)">🏛️ Open Portal</button>
+        </div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function switchView(viewName) {
+  activeView = viewName;
+  document.querySelectorAll('.view-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.dock-btn').forEach(d => d.classList.remove('active'));
+
+  const targetPane = document.getElementById(`view-${viewName}`);
+  if (targetPane) targetPane.classList.add('active');
+
+  const dockMap = { dashboard: 0, catalog: 1, workbench: 2, dossier: 3, bookmarks: 4 };
+  const dockBtns = document.querySelectorAll('.dock-btn');
+  if (dockMap[viewName] !== undefined && dockBtns[dockMap[viewName]]) {
+    dockBtns[dockMap[viewName]].classList.add('active');
+  }
+
+  document.getElementById('sidebar').classList.remove('open');
+  if (viewName === 'bookmarks') renderFavoritesView();
+  if (viewName === 'dossier') renderCasesView();
+}
+
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+function switchWorkbenchTab(tabName) {
+  activeWorkbench = tabName;
+  document.querySelectorAll('.wb-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tool-engine-card').forEach(c => c.style.display = 'none');
+  if (event && event.target) event.target.classList.add('active');
+  const targetCard = document.getElementById(`wb-pane-${tabName}`);
+  if (targetCard) targetCard.style.display = 'block';
+}
+
+// -------------------------------------------------------------
+// 8 INTERACTIVE BANGLADESH ENGINES
+// -------------------------------------------------------------
+
+// 1. NID DECODER (64 District Geocodes)
+const BD_DISTRICT_CODES = {
+  '01': 'Bagerhat', '03': 'Bandarban', '04': 'Barguna', '06': 'Barisal', '09': 'Bhola',
+  '10': 'Bogra', '12': 'Brahmanbaria', '13': 'Chandpur', '15': 'Chittagong (Chattogram)',
+  '18': 'Chapai Nawabganj', '19': 'Comilla (Cumilla)', '22': 'Cox\'s Bazar', '27': 'Chuadanga / Dinajpur',
+  '26': 'Dhaka (Capital)', '30': 'Faridpur / Feni', '32': 'Gaibandha', '33': 'Gazipur',
+  '35': 'Gopalganj', '36': 'Habiganj', '38': 'Joypurhat', '39': 'Jamalpur', '41': 'Jessore (Jashore)',
+  '42': 'Jhalokathi', '44': 'Jhenaidah', '46': 'Khagrachhari', '47': 'Khulna', '49': 'Kurigram',
+  '50': 'Kushtia', '51': 'Lakshmipur', '52': 'Lalmonirhat', '54': 'Madaripur', '55': 'Magura',
+  '56': 'Manikganj', '57': 'Meherpur', '58': 'Moulvibazar', '59': 'Munshiganj', '61': 'Mymensingh',
+  '64': 'Naogaon', '65': 'Narail', '66': 'Netrokona', '67': 'Narayanganj', '68': 'Narsingdi',
+  '70': 'Natore', '73': 'Nilphamari', '75': 'Noakhali', '76': 'Pabna', '77': 'Panchagarh',
+  '78': 'Patuakhali', '79': 'Pirojpur', '81': 'Rajshahi', '82': 'Rajbari', '84': 'Rangamati',
+  '85': 'Rangpur', '86': 'Tangail', '87': 'Satkhira', '88': 'Sirajganj', '89': 'Shariatpur',
+  '90': 'Sunamganj', '91': 'Sylhet', '93': 'Sherpur', '94': 'Thakurgaon'
+};
+
+function runNIDDecoder(val) {
+  const nid = (val || document.getElementById('nid-input').value || '').replace(/[^0-9]/g, '');
+  const name = (document.getElementById('nid-name').value || '').trim();
+  const res = document.getElementById('nid-results');
+
+  if (nid.length !== 10 && nid.length !== 13 && nid.length !== 17) {
+    res.innerHTML = `<div style="color:var(--text-dim); text-align:center;">Enter 10-digit Smart NID, 13-digit, or 17-digit legacy NID (currently ${nid.length} digits)</div>`;
+    return;
+  }
+
+  let nidType = '', distCode = '', birthYear = 'N/A';
+  if (nid.length === 10) {
+    nidType = 'Smart National Identity Card (Smart NID)';
+    distCode = nid.substring(0, 2);
+  } else if (nid.length === 17) {
+    nidType = '17-Digit Full Registration NID (YYYY + 13 Digits)';
+    birthYear = nid.substring(0, 4);
+    distCode = nid.substring(4, 6);
+  } else if (nid.length === 13) {
+    nidType = '13-Digit Legacy NID (Without Birth Year Prefix)';
+    distCode = nid.substring(0, 2);
+  }
+
+  const district = BD_DISTRICT_CODES[distCode] || `District Code [${distCode}]`;
+  const encName = encodeURIComponent(name || 'Citizen');
+
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">Parsed NID Type:</span><span class="result-val">${nidType}</span></div>
+    <div class="result-row"><span class="result-key">NID Number:</span><span class="result-val">${escapeHtml(nid)}</span></div>
+    <div class="result-row"><span class="result-key">Registration District [${distCode}]:</span><span class="result-val">${district}</span></div>
+    <div class="result-row"><span class="result-key">Birth Year (if 17-digit):</span><span class="result-val">${birthYear}</span></div>
+    <div style="margin-top:14px; border-top:1px solid var(--border); padding-top:10px; display:flex; flex-wrap:wrap; gap:6px;">
+      <button class="btn btn-bd" onclick="launchTool('https://services.nidw.gov.bd/nid-pub/', 'NID Wing')">Election Commission NID Portal</button>
+      <button class="btn" onclick="launchTool('https://www.google.com/search?q=%22${nid}%22+site:gov.bd', 'NID Gov.bd Search')">Search NID on .gov.bd</button>
+      <button class="btn" onclick="launchTool('https://www.google.com/search?q=%22${encName}%22+site:gov.bd', 'Citizen Gov Dork')">Search Citizen on .gov.bd</button>
+    </div>
+  `;
+}
+
+// 2. BDRIS BRN
+function runBRNDecoder(val) {
+  const brn = (val || '').replace(/[^0-9]/g, '');
+  const res = document.getElementById('brn-results');
+  if (brn.length !== 17) {
+    res.innerHTML = `<div style="color:var(--text-dim); text-align:center;">Enter 17-digit Birth Registration Number (${brn.length}/17 digits)</div>`;
+    return;
+  }
+  const yyyy = brn.substring(0, 4);
+  const dist = brn.substring(4, 6);
+  const upazila = brn.substring(6, 8);
+  const union = brn.substring(8, 10);
+  const seq = brn.substring(10, 17);
+  const districtName = BD_DISTRICT_CODES[dist] || `District [${dist}]`;
+
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">Year of Birth:</span><span class="result-val">${yyyy} (Age ~${new Date().getFullYear() - parseInt(yyyy, 10)})</span></div>
+    <div class="result-row"><span class="result-key">Registration District [${dist}]:</span><span class="result-val">${districtName}</span></div>
+    <div class="result-row"><span class="result-key">Upazila/Thana Code [${upazila}]:</span><span class="result-val">Code ${upazila}</span></div>
+    <div class="result-row"><span class="result-key">Union/Ward Code [${union}]:</span><span class="result-val">Code ${union}</span></div>
+    <div class="result-row"><span class="result-key">Registration Sequence:</span><span class="result-val">${seq}</span></div>
+    <div style="margin-top:10px;"><button class="btn btn-bd" onclick="launchTool('https://everify.bdris.gov.bd/', 'BDRIS Verify')">Verify on Official BDRIS Portal</button></div>
+  `;
+}
+
+// 3. NBR e-TIN
+function runTINValidator(val) {
+  const tin = (val || '').replace(/[^0-9]/g, '');
+  const res = document.getElementById('tin-results');
+  if (tin.length !== 12) {
+    res.innerHTML = `<div style="color:var(--text-dim); text-align:center;">Enter 12-digit e-TIN (${tin.length}/12 digits)</div>`;
+    return;
+  }
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">e-TIN Number:</span><span class="result-val">${tin.substring(0,4)}-${tin.substring(4,8)}-${tin.substring(8,12)}</span></div>
+    <div class="result-row"><span class="result-key">NBR Syntax Status:</span><span class="result-val" style="color:var(--emerald);">VALID 12-DIGIT STRUCTURE</span></div>
+    <div style="margin-top:10px; display:flex; gap:6px;">
+      <button class="btn btn-bd" onclick="launchTool('https://secure.incometax.gov.bd/TINHome', 'NBR e-TIN')">Open NBR e-TIN Portal</button>
+      <button class="btn" onclick="launchTool('https://incometax.gov.bd/', 'NBR e-Return')">NBR e-Return Portal</button>
+    </div>
+  `;
+}
+
+// 4. BRTA NUMBER PLATE
+const BRTA_CLASSES = {
+  'GA': { bengali: 'গ', name: 'Private Passenger Car / Sedan (1500cc - 2500cc)' },
+  'KHA': { bengali: 'খ', name: 'Jeep / SUV / 4WD Station Wagon' },
+  'BHA': { bengali: 'ভ', name: 'Microbus / Passenger Van' },
+  'CHA': { bengali: 'চ', name: 'Delivery Van / Light Pickup' },
+  'HA': { bengali: 'হ', name: 'Motorcycle / Two-Wheeler (100cc+)' },
+  'LA': { bengali: 'ল', name: 'Moped / Small Motorcycle (50cc - 100cc)' },
+  'DA': { bengali: 'ড', name: 'Medium Commercial Truck (3 - 7 Ton)' },
+  'DHA': { bengali: 'ঢ', name: 'Heavy Commercial Truck (7+ Ton)' },
+  'TA': { bengali: 'ট', name: 'Prime Mover / Heavy Cargo Trailer' },
+  'NA': { bengali: 'ন', name: 'Light Transport Truck' },
+  'PA': { bengali: 'প', name: 'Taxi Cab / Metered Passenger Taxi' },
+  'THA': { bengali: 'থ', name: 'CNG Auto-Rickshaw (3-Wheeler)' },
+  'BA': { bengali: 'ব', name: 'Inter-District Long-Haul Bus' },
+  'JA': { bengali: 'জ', name: 'City Mini-Bus / Local Route Bus' }
+};
+
+function runBRTAParser(val) {
+  const str = (val || '').trim().toUpperCase();
+  const res = document.getElementById('brta-results');
+  if (str.length < 5) {
+    res.innerHTML = `<div style="color:var(--text-dim); text-align:center;">Enter plate string (e.g. DHAKA METRO-GA-11-2345)</div>`;
+    return;
+  }
+
+  const parts = str.split(/[-–\s]+/);
+  let metro = parts[0] || 'Unknown Metro/District';
+  if (parts.length > 1 && parts[1] === 'METRO') {
+    metro = `${parts[0]} METRO`;
+    parts.splice(1, 1);
+  }
+  const clsCode = parts[1] || '';
+  const series = parts[2] || '';
+  const num = parts[3] || '';
+  const clsInfo = BRTA_CLASSES[clsCode] || { bengali: '-', name: `Class Code [${clsCode}]` };
+
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">Authority / Metro:</span><span class="result-val">${escapeHtml(metro)}</span></div>
+    <div class="result-row"><span class="result-key">Vehicle Class [${clsCode} / ${clsInfo.bengali}]:</span><span class="result-val">${clsInfo.name}</span></div>
+    <div class="result-row"><span class="result-key">Series & Number:</span><span class="result-val">Series ${series} - Number ${num}</span></div>
+    <div style="margin-top:10px;"><button class="btn btn-bd" onclick="launchTool('https://bsp.brta.gov.bd/', 'BRTA Portal')">Open BRTA Service Portal (BSP)</button></div>
+  `;
+}
+
+// 5. BD MOBILE OPERATOR
+function runBDMobileParser(val) {
+  const clean = (val || '').replace(/[^0-9]/g, '');
+  const res = document.getElementById('mobile-results');
+  let num = clean;
+  if (num.startsWith('880')) num = num.substring(3);
+  if (num.startsWith('0')) num = num.substring(1);
+
+  if (num.length < 3) {
+    res.innerHTML = `<div style="color:var(--text-dim); text-align:center;">Enter 11-digit Bangladeshi mobile number</div>`;
+    return;
+  }
+
+  const prefix = '0' + num.substring(0, 2);
+  let mno = 'Unknown Network', parent = '';
+  if (prefix === '017' || prefix === '013') { mno = 'Grameenphone (GP)'; parent = 'Telenor Group'; }
+  else if (prefix === '018') { mno = 'Robi Axiata'; parent = 'Axiata Group'; }
+  else if (prefix === '016') { mno = 'Airtel Bangladesh'; parent = 'Robi Axiata / Bharti Airtel'; }
+  else if (prefix === '019' || prefix === '014') { mno = 'Banglalink'; parent = 'VEON'; }
+  else if (prefix === '015') { mno = 'Teletalk Bangladesh'; parent = 'State Owned (Govt of Bangladesh)'; }
+
+  const fullE164 = `+8801${num.substring(1)}`;
+
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">Full E.164 Dialing:</span><span class="result-val">${fullE164}</span></div>
+    <div class="result-row"><span class="result-key">Mobile Network Operator:</span><span class="result-val">${mno}</span></div>
+    <div class="result-row"><span class="result-key">Parent Telecom Group:</span><span class="result-val">${parent}</span></div>
+    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:6px;">
+      <button class="btn btn-bd" onclick="launchTool('https://wa.me/8801${num.substring(1)}', 'WhatsApp')">Open WhatsApp Direct</button>
+      <button class="btn" onclick="launchTool('https://t.me/+8801${num.substring(1)}', 'Telegram')">Telegram Lookup</button>
+      <button class="btn" onclick="launchTool('https://www.truecaller.com/search/8801${num.substring(1)}', 'Truecaller')">Truecaller Web</button>
+    </div>
+  `;
+}
+
+// 6. RJSC RECON
+function runRJSCRecon(val) {
+  const kw = (val || '').trim();
+  const res = document.getElementById('rjsc-results');
+  if (!kw) {
+    res.innerHTML = `<div style="color:var(--text-dim); text-align:center;">Enter company or entity keyword</div>`;
+    return;
+  }
+  const enc = encodeURIComponent(kw);
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">Entity Keyword:</span><span class="result-val">${escapeHtml(kw)}</span></div>
+    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:6px;">
+      <button class="btn btn-bd" onclick="launchTool('https://app.roc.gov.bd/', 'RJSC Search')">RJSC Live Entity Search</button>
+      <button class="btn" onclick="launchTool('https://dsebd.org/company_listing.php', 'DSE Listed')">DSE Listed Corporate Search</button>
+      <button class="btn" onclick="launchTool('https://www.google.com/search?q=%22${enc}%22+site:roc.gov.bd+OR+site:dsebd.org', 'Company Dork')">Google RJSC/DSE Dork</button>
+    </div>
+  `;
+}
+
+// 7. LAND RECON
+function runLandRecon() {
+  const dist = (document.getElementById('land-district').value || '').trim();
+  const upz = (document.getElementById('land-upazila').value || '').trim();
+  const mouza = (document.getElementById('land-mouza').value || '').trim();
+  const khat = (document.getElementById('land-khatian').value || '').trim();
+  const res = document.getElementById('land-results');
+
+  const query = [dist, upz, mouza, khat].filter(Boolean).join(' ');
+  if (!query) {
+    res.innerHTML = `<div style="color:var(--text-dim); text-align:center;">Enter district, upazila, mouza, or khatian particulars above</div>`;
+    return;
+  }
+  const enc = encodeURIComponent(query);
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">Land Particulars:</span><span class="result-val">${escapeHtml(query)}</span></div>
+    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:6px;">
+      <button class="btn btn-bd" onclick="launchTool('https://eporcha.gov.bd/', 'e-Porcha')">e-Porcha Khatian Portal</button>
+      <button class="btn" onclick="launchTool('https://mutation.land.gov.bd/', 'e-Mutation')">e-Mutation Namjari Portal</button>
+      <button class="btn" onclick="launchTool('https://ldtax.gov.bd/', 'LD Tax')">Land Tax (Khajna) Holding</button>
+      <button class="btn" onclick="launchTool('https://www.google.com/search?q=%22${enc}%22+site:eporcha.gov.bd+OR+site:land.gov.bd', 'Land Dork')">Search .land.gov.bd</button>
+    </div>
+  `;
+}
+
+// 8. BD DORKS
+function runBDDorks(val) {
+  const target = (val || '').trim();
+  const res = document.getElementById('bddork-results');
+  if (!target) {
+    res.innerHTML = `<div style="color:var(--text-dim); text-align:center;">Enter target name or entity above</div>`;
+    return;
+  }
+  const enc = encodeURIComponent(target);
+  const dorks = [
+    { title: 'Bangladesh Gazette & SRO Notices', q: `site:dpp.gov.bd OR site:bgpress.gov.bd "${target}"` },
+    { title: 'e-GP Government Tenders & Contracts', q: `site:eprocure.gov.bd "${target}"` },
+    { title: 'Supreme Court & High Court Judgments', q: `site:supremecourt.gov.bd "${target}"` },
+    { title: 'Public & Private University Directory', q: `site:ac.bd OR site:edu.bd "${target}"` },
+    { title: 'Ministry Personnel & Gradation Lists', q: `site:gov.bd filetype:pdf "${target}"` },
+    { title: 'Anti-Corruption Commission (ACC) Notices', q: `site:acc.org.bd "${target}"` }
+  ];
+
+  let html = '';
+  dorks.forEach(d => {
+    const url = `https://www.google.com/search?q=${encodeURIComponent(d.q)}`;
+    html += `
+      <div class="result-row">
+        <div>
+          <div style="font-weight:600; color:var(--emerald);">${d.title}</div>
+          <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">${d.q}</div>
+        </div>
+        <button class="btn btn-bd" style="height:26px;" onclick="launchTool('${url}', '${d.title}')">Execute Dork</button>
+      </div>
+    `;
+  });
+  res.innerHTML = html;
+}
+
+// -------------------------------------------------------------
+// DOSSIER
+// -------------------------------------------------------------
+function openNewCaseModal() { document.getElementById('case-modal').classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function saveNewCase() {
+  const title = (document.getElementById('new-case-title').value || '').trim();
+  const classification = document.getElementById('new-case-class').value;
+  const targetType = document.getElementById('new-case-type').value;
+  const notes = document.getElementById('new-case-notes').value;
+
+  if (!title) { showToast('Please enter a case title', '⚠️'); return; }
+
+  const newCase = {
+    id: 'case_bd_' + Date.now(),
+    title: title,
+    classification: classification,
+    type: targetType,
+    created_at: new Date().toISOString(),
+    notes: notes,
+    evidence: []
+  };
+
+  cases.unshift(newCase);
+  localStorage.setItem('bdosint_cases', JSON.stringify(cases));
+  closeModal('case-modal');
+  showToast(`Case "${title}" created!`, '📋');
+  updateCaseBadge();
+  switchView('dossier');
+}
+
+function updateCaseBadge() { document.getElementById('case-count-badge').innerText = `${cases.length} Cases`; }
+
+function renderCasesView() {
+  const container = document.getElementById('cases-list-container');
+  if (cases.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 40px; color: var(--text-dim); background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border);">
+        <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
+        <div style="font-size: 14px; font-weight: 700;">No active Bangladesh investigation cases</div>
+        <div style="font-size: 12px; margin-top: 4px; margin-bottom: 14px;">Create your first dossier to log evidence, NID details, and export intelligence reports.</div>
+        <button class="btn btn-bd" onclick="openNewCaseModal()">+ Create Investigation Dossier</button>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  cases.forEach(c => {
+    html += `
+      <div class="case-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+          <div>
+            <span style="font-size:10px; font-family:var(--font-mono); padding:2px 8px; border-radius:4px; font-weight:700; background:rgba(0,255,157,0.15); color:var(--emerald); border:1px solid rgba(0,255,157,0.3);">${c.classification}</span>
+            <span style="font-size:11px; color:var(--text-dim); font-family:var(--font-mono); margin-left:8px;">Created: ${new Date(c.created_at).toLocaleDateString()}</span>
+            <h3 style="font-size:15px; font-weight:800; margin-top:4px;">${escapeHtml(c.title)}</h3>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-icon" onclick="exportSingleCase('${c.id}')" title="Export JSON">💾</button>
+            <button class="btn btn-bd" onclick="window.print()" title="Print Report">🖨️ Report</button>
+            <button class="btn btn-icon" style="color:var(--rose);" onclick="deleteCase('${c.id}')">🗑️</button>
+          </div>
+        </div>
+        <p style="font-size:12px; color:var(--text-muted); line-height:1.4;">${escapeHtml(c.notes || 'No notes provided.')}</p>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function exportSingleCase(id) {
+  const c = cases.find(x => x.id === id);
+  if (!c) return;
+  const blob = new Blob([JSON.stringify(c, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `BD_OSINT_Dossier_${c.title.replace(/[^a-zA-Z0-9]/g, '_')}.json`;
+  a.click();
+  showToast('Case JSON exported!', '💾');
+}
+
+function deleteCase(id) {
+  if (!confirm('Are you sure you want to delete this case dossier?')) return;
+  cases = cases.filter(x => x.id !== id);
+  localStorage.setItem('bdosint_cases', JSON.stringify(cases));
+  updateCaseBadge();
+  renderCasesView();
+  showToast('Case deleted', '🗑️');
+}
+
+function importCaseJSON() { document.getElementById('case-import-input').click(); }
+
+function handleCaseFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const imported = JSON.parse(event.target.result);
+      if (imported.title) {
+        imported.id = 'case_bd_' + Date.now();
+        cases.unshift(imported);
+        localStorage.setItem('bdosint_cases', JSON.stringify(cases));
+        updateCaseBadge();
+        renderCasesView();
+        showToast(`Imported: ${imported.title}`, '📋');
+      }
+    } catch (err) {
+      showToast('Invalid JSON file', '⚠️');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function escapeJs(str) {
+  if (!str) return '';
+  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+</script>
+</body>
+</html>
