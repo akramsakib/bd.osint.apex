@@ -1,7 +1,7 @@
 [
   {
     "category": "National Identity, Voter & Citizen Registry",
-    "icon": "\ud83e\udeaa",
+    "icon": "🪪",
     "desc": "Official citizen identity, election commission voter rolls, birth registration & passport tracking",
     "tools": [
       {
@@ -48,7 +48,7 @@
   },
   {
     "category": "Corporate, Companies & Trade Registries",
-    "icon": "\ud83c\udfe2",
+    "icon": "🏢",
     "desc": "RJSC corporate entity records, BIDA investment clearances, DSE stock filings & export directories",
     "tools": [
       {
@@ -100,12 +100,22 @@
         "title": "BSCIC - Small and Cottage Industries Corporation",
         "url": "http://www.bscic.gov.bd/",
         "desc": "Directory of small & medium enterprises (SMEs), industrial estate plots, and handicraft business registrations."
+      },
+      {
+        "title": "BTTC - Bangladesh Trade and Tariff Commission",
+        "url": "https://bttc.gov.bd/",
+        "desc": "Statutory autonomous body advising on tariff policy, trade remedies, anti-dumping investigations, and industrial protection."
+      },
+      {
+        "title": "NTCL - National Tea Company Limited",
+        "url": "https://ntclbd.org/",
+        "desc": "Public limited enterprise and major government-participated commercial agribusiness company listed on DSE."
       }
     ]
   },
   {
     "category": "Taxation, Revenue, Customs & NBR",
-    "icon": "\ud83d\udcb0",
+    "icon": "💰",
     "desc": "National Board of Revenue e-TIN lookups, VAT BIN registration, Customs ASYCUDA & tax return status",
     "tools": [
       {
@@ -142,7 +152,7 @@
   },
   {
     "category": "Land Records, Survey, e-Porcha & Mutation",
-    "icon": "\ud83d\uddfa\ufe0f",
+    "icon": "🗺️",
     "desc": "e-Porcha Khatian land records, namjari mutation, land tax (Khajna) & RAJUK master planning",
     "tools": [
       {
@@ -189,7 +199,7 @@
   },
   {
     "category": "Vehicles, Transport & Driving Licenses (BRTA)",
-    "icon": "\ud83d\ude97",
+    "icon": "🚗",
     "desc": "BRTA driving license validation, motor vehicle registration, number plate analysis & railway logs",
     "tools": [
       {
@@ -216,7 +226,7 @@
   },
   {
     "category": "Judiciary, Supreme Court & Law Enforcement",
-    "icon": "\u2696\ufe0f",
+    "icon": "⚖️",
     "desc": "Supreme Court cause lists, bdlaws codified acts, district courts, online GD & police clearance",
     "tools": [
       {
@@ -263,12 +273,17 @@
         "title": "Anti-Corruption Commission (ACC / DUDOK)",
         "url": "http://acc.org.bd/",
         "desc": "Statutory anti-corruption authority public charge sheets, asset probe notices, institutional inquiry reports, and whistleblower hotlines."
+      },
+      {
+        "title": "NTMC - National Telecommunication Monitoring Centre",
+        "url": "https://ntmc.gov.bd/",
+        "desc": "National-level intelligence and lawful interception agency responsible for telecommunication monitoring, lawful interception and digital surveillance."
       }
     ]
   },
   {
     "category": "Central Banking, FININT, Sanctions & BFIU",
-    "icon": "\ud83c\udfe6",
+    "icon": "🏦",
     "desc": "Bangladesh Bank authorized banks, BFIU AML/CFT sanctions, MRA NGO MFIs & SEC market regulators",
     "tools": [
       {
@@ -300,7 +315,7 @@
   },
   {
     "category": "Telecom, Cyber Infrastructure & CIRT",
-    "icon": "\ud83d\udce1",
+    "icon": "📡",
     "desc": "BTRC licensed ISPs, BGD e-GOV CIRT threat intelligence, BTCL .bd domain registry & mobile operators",
     "tools": [
       {
@@ -322,12 +337,22 @@
         "title": "Bangladesh Computer Council (BCC)",
         "url": "https://bcc.gov.bd/",
         "desc": "National Data Center infrastructure, Tier-III / Tier-IV government cloud hosting, and national digital infrastructure standards."
+      },
+      {
+        "title": "BTCL - State Telecommunication Services & Directory",
+        "url": "https://btcl.gov.bd/",
+        "desc": "State-owned fixed-line telecom operator, nationwide fiber backbone, telephone subscriber directory and public telecom services."
+      },
+      {
+        "title": "BTRC - NTTN & Telecom Licensee Directory",
+        "url": "https://btrc.gov.bd/",
+        "desc": "Official BTRC directory of nationwide transmission networks (NTTN - Fiber@Home, Summit, BTCL, Bahon), IGW, ICX, and licensed ISPs."
       }
     ]
   },
   {
     "category": "Academic, Education & Professional Councils",
-    "icon": "\ud83c\udf93",
+    "icon": "🎓",
     "desc": "UGC university approvals, BANBEIS EIIN school database, BMDC medical licenses & Bar Council advocates",
     "tools": [
       {
@@ -369,7 +394,7 @@
   },
   {
     "category": "Gazettes, Public Procurement & Govt Officers",
-    "icon": "\ud83d\udcdc",
+    "icon": "📜",
     "desc": "BG Press extraordinary gazettes, e-GP government tenders, Cabinet division & BCS gradation lists",
     "tools": [
       {
@@ -401,7 +426,7 @@
   },
   {
     "category": "Health, Pharmaceuticals & Drug Administration",
-    "icon": "\ud83d\udc8a",
+    "icon": "💊",
     "desc": "DGDA pharmaceutical brand registrations, DGHS licensed hospitals & Surokkha verification",
     "tools": [
       {
@@ -423,7 +448,7 @@
   },
   {
     "category": "NGOs, Non-Profit & Social Welfare Registries",
-    "icon": "\ud83e\udd1d",
+    "icon": "🤝",
     "desc": "NGO Affairs Bureau foreign-funded NGO clearances & Department of Social Services registries",
     "tools": [
       {
@@ -440,7 +465,7 @@
   },
   {
     "category": "Geospatial, Maritime, Weather & Ports",
-    "icon": "\u2693",
+    "icon": "⚓",
     "desc": "Survey of Bangladesh maps, BMD cyclone radars, Chittagong/Mongla port vessels & BIWTA waterways",
     "tools": [
       {
@@ -482,7 +507,7 @@
   },
   {
     "category": "Media, Newspapers & Press Council",
-    "icon": "\ud83d\udcf0",
+    "icon": "📰",
     "desc": "Ministry of Information accredited press, DFP media listings & Bangladesh Press Council",
     "tools": [
       {
