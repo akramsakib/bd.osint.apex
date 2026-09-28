@@ -40,7 +40,7 @@ Directly indexing official regulatory bodies, ministries, directorates, judicial
 
 ---
 
-## 🛠️ 8 Interactive Bangladesh Intelligence Engines
+## 🛠️ 9 Interactive Bangladesh Intelligence Engines
 
 BD-OSINT Apex features 8 standalone client-side parsers built specifically for Bangladeshi identifiers:
 

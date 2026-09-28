@@ -819,7 +819,7 @@
       </div>
       <div class="nav-item" onclick="switchView('workbench')">
         <span class="nav-item-icon">⚡</span><span>BD Active Engines</span>
-        <span class="nav-item-count" style="color:var(--emerald);">8 Active</span>
+        <span class="nav-item-count" style="color:var(--emerald);">9 Active</span>
       </div>
       <div class="nav-item" onclick="switchView('dossier')">
         <span class="nav-item-icon">📋</span><span>Investigation Dossier</span>
@@ -873,8 +873,8 @@
           </div>
           <div class="stat-card">
             <div class="stat-label">BD Interactive Decoders</div>
-            <div class="stat-value" style="color: var(--amber);">8</div>
-            <div class="stat-spark">⚡ NID, BRN, e-TIN, BRTA, e-Porcha</div>
+            <div class="stat-value" style="color: var(--amber);">9</div>
+            <div class="stat-spark">⚡ NID, BRN, e-TIN, BRTA, NTMC CDR</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">District Geocodes</div>
@@ -916,6 +916,7 @@
           <button class="wb-tab" onclick="switchWorkbenchTab('rjsc', this)">🏢 RJSC Company Search</button>
           <button class="wb-tab" onclick="switchWorkbenchTab('land', this)">🗺️ e-Porcha & Khatian Recon</button>
           <button class="wb-tab" onclick="switchWorkbenchTab('dorks', this)">🔎 Gov.bd Google Dork Studio</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('ntmc', this)" style="border-color:rgba(244,63,94,0.4); color:var(--rose);">🚨 NTMC Telecom & CDR Studio</button>
         </div>
 
         <!-- ENGINE 1: NID -->
@@ -1069,6 +1070,92 @@
             <div style="color:var(--text-dim); text-align:center;">Enter target name to generate high-impact dorks for gazettes, e-GP tenders, court rulings, and government staff lists.</div>
           </div>
         </div>
+      
+        <!-- ENGINE 9: NTMC TELECOM & CDR FORENSIC STUDIO -->
+        <div id="wb-pane-ntmc" class="tool-engine-card" style="display:none; border: 1px solid rgba(244,63,94,0.3); background: linear-gradient(180deg, rgba(244,63,94,0.04) 0%, var(--bg-card) 100%);">
+          <div class="engine-header" style="border-bottom: 1px solid rgba(244,63,94,0.2);">
+            <div>
+              <div class="engine-title" style="color:#ff6b81;">
+                <span>🚨</span> NTMC Telecom & CDR Intelligence Studio (Direct UI — No Login Required)
+              </div>
+              <div style="font-size:11px; color:var(--text-dim); margin-top:2px;">
+                Direct Client-Side IMSI/IMEI Dissector, Cell Tower Triangulation & Call Detail Record (CDR) Forensic Analyzer
+              </div>
+            </div>
+            <span class="brand-badge" style="background:rgba(244,63,94,0.15); color:var(--rose); border-color:rgba(244,63,94,0.4);">
+              DIRECT NO-LOGIN UI
+            </span>
+          </div>
+
+          <!-- SUB-TABS -->
+          <div style="display:flex; gap:6px; margin-bottom:14px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+            <button class="btn btn-bd" id="ntmc-subtab-btn-1" style="font-size:11px; height:28px;" onclick="switchNTMCSubTab(1)">📱 MSISDN / IMSI / IMEI Parser</button>
+            <button class="btn" id="ntmc-subtab-btn-2" style="font-size:11px; height:28px;" onclick="switchNTMCSubTab(2)">📡 BTS Tower Triangulation</button>
+            <button class="btn" id="ntmc-subtab-btn-3" style="font-size:11px; height:28px;" onclick="switchNTMCSubTab(3)">📊 CDR Log & Network Graph</button>
+          </div>
+
+          <!-- SUB-PANE 1: MSISDN/IMSI/IMEI -->
+          <div id="ntmc-subpane-1">
+            <div class="input-grid">
+              <div class="input-group">
+                <label class="input-label">Target Mobile Number (MSISDN)</label>
+                <input type="text" id="ntmc-msisdn" class="text-input" placeholder="e.g. 01712345678 or +8801812345678" oninput="runNTMCPhoneAnalysis()">
+              </div>
+              <div class="input-group">
+                <label class="input-label">15-Digit IMEI Device Identifier</label>
+                <input type="text" id="ntmc-imei" class="text-input" placeholder="e.g. 864234051234567" maxlength="15" oninput="runNTMCImeiAnalysis(this.value)">
+              </div>
+              <div class="input-group">
+                <label class="input-label">15-Digit IMSI SIM Identifier (BD MCC: 470)</label>
+                <input type="text" id="ntmc-imsi" class="text-input" placeholder="e.g. 470011234567890" maxlength="15" oninput="runNTMCImsiAnalysis(this.value)">
+              </div>
+            </div>
+            <div id="ntmc-telecom-results" class="result-box">
+              <div style="color:var(--text-dim); text-align:center;">Enter MSISDN, IMEI, or IMSI above for instant telecom intelligence and direct OSINT queries.</div>
+            </div>
+          </div>
+
+          <!-- SUB-PANE 2: CELL TOWER TRIANGULATION -->
+          <div id="ntmc-subpane-2" style="display:none;">
+            <div class="input-grid">
+              <div class="input-group">
+                <label class="input-label">Operator MNC (Bangladesh MCC: 470)</label>
+                <select id="ntmc-tower-mnc" class="text-input" onchange="runNTMCTowerQuery()">
+                  <option value="01">470-01 : Grameenphone (GP)</option>
+                  <option value="02">470-02 : Robi Axiata / Airtel</option>
+                  <option value="03">470-03 : Banglalink (VEON)</option>
+                  <option value="04">470-04 : Teletalk Bangladesh</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label class="input-label">Location Area Code (LAC / TAC)</label>
+                <input type="text" id="ntmc-tower-lac" class="text-input" placeholder="e.g. 1024 or 3051" oninput="runNTMCTowerQuery()">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Cell ID (CID / eNodeB ID)</label>
+                <input type="text" id="ntmc-tower-cid" class="text-input" placeholder="e.g. 45213 or 120934" oninput="runNTMCTowerQuery()">
+              </div>
+            </div>
+            <div id="ntmc-tower-results" class="result-box">
+              <div style="color:var(--text-dim); text-align:center;">Enter LAC and Cell ID to generate direct BTS tower geolocation queries on CellMapper and OpenCellID for Bangladesh.</div>
+            </div>
+          </div>
+
+          <!-- SUB-PANE 3: CDR LOG ANALYZER -->
+          <div id="ntmc-subpane-3" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label class="input-label">Paste Raw CDR Call Logs (Timestamp, Calling No, Called No, Duration Sec, Tower ID)</label>
+              <button class="btn btn-bd" style="height:24px; font-size:10px;" onclick="loadSampleBDCDR()">⚡ Load Sample BD CDR</button>
+            </div>
+            <textarea id="ntmc-cdr-input" class="text-input" style="height:110px; padding:8px 12px; font-family:var(--font-mono); font-size:11px;" placeholder="2026-09-28 01:14:22, 01711223344, 01899887766, 240, TOWER_DHAKA_042
+2026-09-28 02:45:10, 01711223344, 01955443322, 120, TOWER_DHAKA_019
+2026-09-28 09:12:00, 01711223344, 01899887766, 45, TOWER_GULSHAN_11" oninput="runNTMCCDRAnalysis()"></textarea>
+            <div id="ntmc-cdr-results" class="result-box" style="margin-top:10px;">
+              <div style="color:var(--text-dim); text-align:center;">Paste CDR records or click "Load Sample BD CDR" to analyze call patterns, suspicious late-night activity, and top contacted targets.</div>
+            </div>
+          </div>
+        </div>
+
       </section>
 
       <!-- 4. DOSSIER -->
@@ -1886,6 +1973,219 @@ function escapeJs(str) {
   if (!str) return '';
   return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
+
+
+// -------------------------------------------------------------
+// 9. NTMC TELECOM & CDR INTELLIGENCE STUDIO
+// -------------------------------------------------------------
+
+function switchNTMCSubTab(tabIdx) {
+  for (let i = 1; i <= 3; i++) {
+    const pane = document.getElementById(`ntmc-subpane-${i}`);
+    const btn = document.getElementById(`ntmc-subtab-btn-${i}`);
+    if (pane) pane.style.display = (i === tabIdx) ? 'block' : 'none';
+    if (btn) {
+      if (i === tabIdx) {
+        btn.classList.add('btn-bd');
+      } else {
+        btn.classList.remove('btn-bd');
+      }
+    }
+  }
+}
+
+function runNTMCPhoneAnalysis() {
+  const msisdn = (document.getElementById('ntmc-msisdn').value || '').replace(/[^0-9]/g, '');
+  const res = document.getElementById('ntmc-telecom-results');
+
+  let num = msisdn;
+  if (num.startsWith('880')) num = num.substring(3);
+  if (num.startsWith('0')) num = num.substring(1);
+
+  if (num.length < 3) {
+    res.innerHTML = `<div style="color:var(--text-dim); text-align:center;">Enter Bangladeshi mobile number (11 digits)</div>`;
+    return;
+  }
+
+  const prefix = '0' + num.substring(0, 2);
+  let operator = 'Unknown Operator', mccMnc = '470-XX', tech = '2G/3G/4G/5G Ready';
+  if (prefix === '017' || prefix === '013') { operator = 'Grameenphone (GP)'; mccMnc = '470-01'; }
+  else if (prefix === '018') { operator = 'Robi Axiata'; mccMnc = '470-02'; }
+  else if (prefix === '016') { operator = 'Airtel Bangladesh (Robi)'; mccMnc = '470-02'; }
+  else if (prefix === '019' || prefix === '014') { operator = 'Banglalink (VEON)'; mccMnc = '470-03'; }
+  else if (prefix === '015') { operator = 'Teletalk Bangladesh (Govt)'; mccMnc = '470-04'; }
+
+  const fullE164 = `+8801${num.substring(1)}`;
+
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">Parsed MSISDN (E.164):</span><span class="result-val" style="color:var(--cyan);">${fullE164}</span></div>
+    <div class="result-row"><span class="result-key">Mobile Network Operator:</span><span class="result-val">${operator}</span></div>
+    <div class="result-row"><span class="result-key">National MCC-MNC Code:</span><span class="result-val">${mccMnc} (Bangladesh)</span></div>
+    <div class="result-row"><span class="result-key">Network Capabilities:</span><span class="result-val">${tech}</span></div>
+    <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px;">
+      <button class="btn btn-bd" onclick="launchTool('https://wa.me/8801${num.substring(1)}', 'WhatsApp Direct')">💬 Direct WhatsApp Chat</button>
+      <button class="btn" onclick="launchTool('https://t.me/+8801${num.substring(1)}', 'Telegram Lookup')">✈️ Telegram Profile</button>
+      <button class="btn" onclick="launchTool('https://www.truecaller.com/search/8801${num.substring(1)}', 'Truecaller BD')">🔎 Truecaller Name Search</button>
+      <button class="btn" onclick="launchTool('https://www.google.com/search?q=%22${fullE164}%22+OR+%2201${num.substring(1)}%22', 'Google Web Recon')">🌐 Search Web Footprint</button>
+    </div>
+  `;
+}
+
+function runNTMCImeiAnalysis(val) {
+  const imei = (val || '').replace(/[^0-9]/g, '');
+  const res = document.getElementById('ntmc-telecom-results');
+  if (imei.length < 8) return;
+
+  const tac = imei.substring(0, 8);
+  const rbi = imei.substring(0, 2);
+  const serial = imei.substring(8, 14);
+  const checkDigit = imei.length === 15 ? imei.charAt(14) : 'N/A';
+
+  // Luhn Algorithm Check
+  let luhnValid = false;
+  if (imei.length === 15) {
+    let sum = 0;
+    for (let i = 0; i < 15; i++) {
+      let digit = parseInt(imei.charAt(i), 10);
+      if (i % 2 === 1) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+      sum += digit;
+    }
+    luhnValid = (sum % 10 === 0);
+  }
+
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">IMEI Structure:</span><span class="result-val">${imei} (${imei.length}/15 Digits)</span></div>
+    <div class="result-row"><span class="result-key">Type Allocation Code (TAC):</span><span class="result-val">${tac}</span></div>
+    <div class="result-row"><span class="result-key">Reporting Body ID (RBI):</span><span class="result-val">${rbi}</span></div>
+    <div class="result-row"><span class="result-key">Device Serial Number (SNR):</span><span class="result-val">${serial || 'Pending...'}</span></div>
+    <div class="result-row"><span class="result-key">Luhn Checksum Verification:</span><span class="result-val" style="color:${luhnValid ? 'var(--emerald)' : 'var(--amber)'};">${luhnValid ? 'VALID 15-DIGIT IMEI CHECKSUM' : 'VERIFYING / PENDING 15TH DIGIT'}</span></div>
+    <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px;">
+      <button class="btn btn-bd" onclick="launchTool('https://www.imei.info/?imei=${imei}', 'IMEI.info')">📱 IMEI.info Hardware Lookup</button>
+      <button class="btn" onclick="launchTool('https://imeicheck.com/imei-check', 'IMEICheck')">🔍 Device Model & Blacklist Status</button>
+      <button class="btn" onclick="launchTool('https://btrc.gov.bd/', 'BTRC NEIR')">🏛️ BTRC Handset Verification Portal</button>
+    </div>
+  `;
+}
+
+function runNTMCImsiAnalysis(val) {
+  const imsi = (val || '').replace(/[^0-9]/g, '');
+  const res = document.getElementById('ntmc-telecom-results');
+  if (imsi.length < 5) return;
+
+  const mcc = imsi.substring(0, 3);
+  const mnc = imsi.substring(3, 5);
+  const msin = imsi.substring(5);
+
+  let operator = 'International / Unknown';
+  if (mcc === '470') {
+    if (mnc === '01') operator = 'Grameenphone (GP)';
+    else if (mnc === '02') operator = 'Robi Axiata / Airtel';
+    else if (mnc === '03') operator = 'Banglalink';
+    else if (mnc === '04') operator = 'Teletalk Bangladesh';
+    else operator = `Bangladesh MNC [${mnc}]`;
+  }
+
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">IMSI Number:</span><span class="result-val">${imsi}</span></div>
+    <div class="result-row"><span class="result-key">Mobile Country Code (MCC):</span><span class="result-val">${mcc} (${mcc === '470' ? 'Bangladesh 🇧🇩' : 'Foreign SIM'})</span></div>
+    <div class="result-row"><span class="result-key">Mobile Network Code (MNC):</span><span class="result-val">${mnc} (${operator})</span></div>
+    <div class="result-row"><span class="result-key">Mobile Subscriber Identification Number (MSIN):</span><span class="result-val">${msin || 'N/A'}</span></div>
+  `;
+}
+
+function runNTMCTowerQuery() {
+  const mnc = document.getElementById('ntmc-tower-mnc').value;
+  const lac = (document.getElementById('ntmc-tower-lac').value || '').trim();
+  const cid = (document.getElementById('ntmc-tower-cid').value || '').trim();
+  const res = document.getElementById('ntmc-tower-results');
+
+  if (!lac && !cid) {
+    res.innerHTML = `<div style="color:var(--text-dim); text-align:center;">Enter LAC and Cell ID to query Bangladesh cell towers without needing login.</div>`;
+    return;
+  }
+
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">Tower Parameters:</span><span class="result-val">MCC: 470 | MNC: ${mnc} | LAC: ${escapeHtml(lac || 'ANY')} | CID: ${escapeHtml(cid || 'ANY')}</span></div>
+    <div class="result-row"><span class="result-key">Target Area Triangulation:</span><span class="result-val" style="color:var(--cyan);">Direct Open Geolocation Ready</span></div>
+    <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px;">
+      <button class="btn btn-bd" onclick="launchTool('https://www.cellmapper.net/map?MCC=470&MNC=${mnc}&type=LTE', 'CellMapper BD')">🗺️ Open CellMapper Bangladesh Grid</button>
+      <button class="btn" onclick="launchTool('https://opencellid.org/#zoom=12&lat=23.8103&lon=90.4125', 'OpenCellID')">📡 OpenCellID BD Tower Database</button>
+      <button class="btn" onclick="launchTool('https://www.google.com/search?q=MCC+470+MNC+${mnc}+LAC+${lac}+CID+${cid}+Bangladesh', 'Tower Dork')">🔎 Google Cell Tower Dork</button>
+    </div>
+  `;
+}
+
+function loadSampleBDCDR() {
+  const sample = `2026-09-28 01:14:22, 01711223344, 01899887766, 240, TOWER_DHAKA_042
+2026-09-28 02:45:10, 01711223344, 01955443322, 120, TOWER_DHAKA_019
+2026-09-28 03:10:05, 01711223344, 01899887766, 450, TOWER_GULSHAN_11
+2026-09-28 09:12:00, 01711223344, 01899887766, 45, TOWER_GULSHAN_11
+2026-09-28 11:30:15, 01711223344, 01555667788, 60, TOWER_BANANI_08
+2026-09-28 14:20:00, 01711223344, 01955443322, 180, TOWER_UTTARA_22
+2026-09-28 23:55:40, 01711223344, 01899887766, 300, TOWER_DHAKA_042`;
+  document.getElementById('ntmc-cdr-input').value = sample;
+  runNTMCCDRAnalysis();
+  showToast('Sample BD CDR loaded!', '⚡');
+}
+
+function runNTMCCDRAnalysis() {
+  const raw = (document.getElementById('ntmc-cdr-input').value || '').trim();
+  const res = document.getElementById('ntmc-cdr-results');
+  if (!raw) {
+    res.innerHTML = `<div style="color:var(--text-dim); text-align:center;">Paste CDR records or click "Load Sample BD CDR" to analyze call patterns.</div>`;
+    return;
+  }
+
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  let totalCalls = 0;
+  let totalDurationSec = 0;
+  const contactFreq = {};
+  const towers = new Set();
+  let lateNightCalls = 0;
+
+  lines.forEach(line => {
+    const parts = line.split(/[,\t|]+/).map(p => p.trim());
+    if (parts.length >= 3) {
+      totalCalls++;
+      const timeStr = parts[0];
+      const caller = parts[1];
+      const callee = parts[2];
+      const dur = parseInt(parts[3] || '0', 10);
+      const tower = parts[4] || 'Unknown';
+
+      if (!isNaN(dur)) totalDurationSec += dur;
+      if (tower) towers.add(tower);
+
+      contactFreq[callee] = (contactFreq[callee] || 0) + 1;
+
+      // Late night check (between 00:00 and 05:00)
+      if (timeStr.includes(' 00:') || timeStr.includes(' 01:') || timeStr.includes(' 02:') || timeStr.includes(' 03:') || timeStr.includes(' 04:')) {
+        lateNightCalls++;
+      }
+    }
+  });
+
+  const sortedContacts = Object.entries(contactFreq).sort((a, b) => b[1] - a[1]);
+  const topTargets = sortedContacts.slice(0, 3);
+
+  let topTargetsHtml = '';
+  topTargets.forEach(([num, count]) => {
+    topTargetsHtml += `<div style="display:inline-block; margin-right:8px; font-family:var(--font-mono); color:var(--emerald); background:rgba(0,255,157,0.1); padding:2px 6px; border-radius:4px; font-size:11px;">${escapeHtml(num)}: ${count} calls</div>`;
+  });
+
+  res.innerHTML = `
+    <div class="result-row"><span class="result-key">Total Call Records Analyzed:</span><span class="result-val">${totalCalls} CDR Events</span></div>
+    <div class="result-row"><span class="result-key">Total Cumulative Duration:</span><span class="result-val">${Math.round(totalDurationSec / 60)} Minutes (${totalDurationSec} Seconds)</span></div>
+    <div class="result-row"><span class="result-key">Unique Contact Numbers:</span><span class="result-val">${Object.keys(contactFreq).length} Targets</span></div>
+    <div class="result-row"><span class="result-key">Suspicious Late-Night Calls (12 AM - 5 AM):</span><span class="result-val" style="color:${lateNightCalls > 0 ? 'var(--rose)' : 'var(--emerald)'}; font-weight:700;">${lateNightCalls} Events Flagged</span></div>
+    <div class="result-row"><span class="result-key">Unique Cell Towers Logged:</span><span class="result-val">${towers.size} Distinct BTS Sectors</span></div>
+    <div class="result-row"><span class="result-key">Top Interacted Targets:</span><span class="result-val">${topTargetsHtml || 'None'}</span></div>
+  `;
+}
+
 </script>
 </body>
 </html>
