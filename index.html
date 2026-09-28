@@ -908,14 +908,14 @@
       <!-- 3. INTERACTIVE ENGINES -->
       <section id="view-workbench" class="view-pane">
         <div class="workbench-tabs">
-          <button class="wb-tab active" onclick="switchWorkbenchTab('nid')">🪪 NID & District Geocode</button>
-          <button class="wb-tab" onclick="switchWorkbenchTab('brn')">👶 BDRIS Birth Registration</button>
-          <button class="wb-tab" onclick="switchWorkbenchTab('tin')">💰 NBR e-TIN & Tax Zone</button>
-          <button class="wb-tab" onclick="switchWorkbenchTab('brta')">🚗 BRTA Number Plate Decoder</button>
-          <button class="wb-tab" onclick="switchWorkbenchTab('mobile')">📱 BD Mobile Operator (MNO)</button>
-          <button class="wb-tab" onclick="switchWorkbenchTab('rjsc')">🏢 RJSC Company Search</button>
-          <button class="wb-tab" onclick="switchWorkbenchTab('land')">🗺️ e-Porcha & Khatian Recon</button>
-          <button class="wb-tab" onclick="switchWorkbenchTab('dorks')">🔎 Gov.bd Google Dork Studio</button>
+          <button class="wb-tab active" onclick="switchWorkbenchTab('nid', this)">🪪 NID & District Geocode</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('brn', this)">👶 BDRIS Birth Registration</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('tin', this)">💰 NBR e-TIN & Tax Zone</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('brta', this)">🚗 BRTA Number Plate Decoder</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('mobile', this)">📱 BD Mobile Operator (MNO)</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('rjsc', this)">🏢 RJSC Company Search</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('land', this)">🗺️ e-Porcha & Khatian Recon</button>
+          <button class="wb-tab" onclick="switchWorkbenchTab('dorks', this)">🔎 Gov.bd Google Dork Studio</button>
         </div>
 
         <!-- ENGINE 1: NID -->
@@ -1905,7 +1905,7 @@ function renderCatalogTools() {
           </button>
         </div>
         <div class="tool-card-actions">
-          <span class="tool-url-preview" title="${escapeHtml(t.url)}">${escapeHtml(t.url.replace(/^https?:\\/\\//, ''))}</span>
+          <span class="tool-url-preview" title="${escapeHtml(t.url)}">${escapeHtml(t.url.replace(/^https?:\/\//, ''))}</span>
           <button class="btn btn-icon" style="height:26px; width:26px;" onclick="copyToClipboard('${escapeJs(t.url)}', '${escapeJs(t.title)}', event)">📋</button>
           <button class="btn btn-bd" style="height:26px; padding:0 8px; font-size:11px;" onclick="launchTool('${escapeJs(t.url)}', '${escapeJs(t.title)}', event)">🏛️ Open Portal</button>
         </div>
@@ -1957,7 +1957,7 @@ function renderFavoritesView() {
           <button class="btn btn-icon" style="height:26px; width:26px; color:var(--amber);" onclick="toggleFavorite(${t.id}, event)">★</button>
         </div>
         <div class="tool-card-actions">
-          <span class="tool-url-preview">${escapeHtml(t.url.replace(/^https?:\\/\\//, ''))}</span>
+          <span class="tool-url-preview">${escapeHtml(t.url.replace(/^https?:\/\//, ''))}</span>
           <button class="btn btn-icon" style="height:26px; width:26px;" onclick="copyToClipboard('${escapeJs(t.url)}', '${escapeJs(t.title)}', event)">📋</button>
           <button class="btn btn-bd" style="height:26px; padding:0 8px; font-size:11px;" onclick="launchTool('${escapeJs(t.url)}', '${escapeJs(t.title)}', event)">🏛️ Open Portal</button>
         </div>
@@ -1989,11 +1989,12 @@ function switchView(viewName) {
 
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 
-function switchWorkbenchTab(tabName) {
+function switchWorkbenchTab(tabName, el) {
   activeWorkbench = tabName;
   document.querySelectorAll('.wb-tab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tool-engine-card').forEach(c => c.style.display = 'none');
-  if (event && event.target) event.target.classList.add('active');
+  const targetBtn = el || (window.event ? (window.event.currentTarget || window.event.target) : null);
+  if (targetBtn && targetBtn.classList) targetBtn.classList.add('active');
   const targetCard = document.getElementById(`wb-pane-${tabName}`);
   if (targetCard) targetCard.style.display = 'block';
 }
